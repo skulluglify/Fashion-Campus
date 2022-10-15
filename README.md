@@ -1,7 +1,15 @@
 # Fashion-Campus
 Final Project Startup Campus Track BE x AI
 
-python version 3.8.10
+### RULES
+- Master no push no merge
+- Development no push (just merge request)
+
+## Python Version
+```
+python3 --version
+```
+Must 'Python 3.8.10'
 
 ## Create Virtual Enviroment
 ```
