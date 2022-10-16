@@ -6,7 +6,7 @@ from flask import Flask
 # from route.admin-page import admin-page.bp
 
 # just for testing
-from route.utils import run_query
+from utils import run_query
 
 def create_app():
     app = Flask(__name__)
