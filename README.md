@@ -2,8 +2,9 @@
 Final Project Startup Campus Track BE x AI
 
 ### RULES
-- Master no push no merge
-- Development no push (just merge request)
+- Master **NO PUSH NO MERGE**
+- Development **NO PUSH** (just merge request)
+- Only use "SELECT/ INSERT/ UPDATE/ DELETE" on **run_query**
 
 ## Python Version
 ```
@@ -28,4 +29,5 @@ pip install -r req.txt
 
 ## Run Server
 ```
+python3 main.py
 ```
