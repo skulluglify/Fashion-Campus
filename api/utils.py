@@ -2,7 +2,7 @@ def run_query(query, commit: bool = False):
     from sqlalchemy import create_engine, text
     # DO NOT SHARE THIS INFORMATION, THANK YOU :D
     pg_creds = {
-        "host": "34.87.94.205",
+        "host": "34.87.139.54",
         "port": "5432",
         "user": "postgres",
         "pass": "asdasdasd",

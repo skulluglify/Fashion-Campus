@@ -17,7 +17,7 @@ def create_app():
 
     # for testing able to connect with db or not
     # go to Fashion-Campus/api then run "python3 main.py"
-    print(run_query("SELECT * FROM categories"))
+    print(run_query("SELECT * FROM coba"))
     # it should return empty list
 
     return app
