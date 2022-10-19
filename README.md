@@ -5,6 +5,7 @@ Final Project Startup Campus Track BE x AI
 - Master **NO PUSH NO MERGE**
 - Development **NO PUSH** (just merge request)
 - Only use "SELECT/ INSERT/ UPDATE/ DELETE" on **run_query**
+- Don't touch/ use file schema.py
 
 ## Python Version
 ```

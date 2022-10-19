@@ -1,5 +1,6 @@
-def run_query(query, commit: bool = False):
-    from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text
+
+def call_engine():
     # DO NOT SHARE THIS INFORMATION, THANK YOU :D
     pg_creds = {
         "host": "34.87.139.54",
@@ -8,7 +9,6 @@ def run_query(query, commit: bool = False):
         "pass": "asdasdasd",
         "db": "FCampus",
     }
-
     engine_uri = "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
         pg_creds["user"],
         pg_creds["pass"],
@@ -17,13 +17,16 @@ def run_query(query, commit: bool = False):
         pg_creds["db"],
     )
     engine = create_engine(engine_uri)
+    return engine
 
+
+def run_query(query, commit: bool = False):
+    engine = call_engine()
     if isinstance(query, str):
         query = text(query)
 
     with engine.connect() as conn:
         if commit:
             conn.execute(query)
-            conn.commit()
         else:
             return [dict(row) for row in conn.execute(query)]
