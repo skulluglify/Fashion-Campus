@@ -25,16 +25,10 @@ def create_app():
         import sys
         sys.exit("Server Offline") 
 
-    """ CHECK RECREATE """
-    # recreate_table_users(call_engine())
-    # print("RECREATED USERS", run_query("SELECT * FROM users"))
-
-    """ AUTO RECREATE TABLES """
-    # run_query("DROP TABLE IF EXISTS orders", True)
-    # run_query("DROP TABLE IF EXISTS carts", True)
-    # run_query("DROP TABLE IF EXISTS products", True)
-    # run_query("DROP TABLE IF EXISTS categories", True)
-    # run_query("DROP TABLE IF EXISTS users", True)
+    """ RECREATE TABLES """
+    # all_table = ["orders", "carts", "products", "categories", "users", "banners"]
+    # all_table = ["orders", "carts", "products", "categories", "users"]
+    # drop_table(all_table)
 
     # recreate_table_users(call_engine())
     # print("FINISHED USERS")
@@ -46,6 +40,8 @@ def create_app():
     # print("FINISHED CARTS")
     # recreate_table_orders(call_engine())
     # print("FINISHED ORDERS")
+    # recreate_table_banners(call_engine())
+    # print("FINISHED BANNER")
 
     return app
 
