@@ -30,22 +30,22 @@ def create_app():
     # print("RECREATED USERS", run_query("SELECT * FROM users"))
 
     """ AUTO RECREATE TABLES """
-    run_query("DROP TABLE IF EXISTS payments", True)
-    run_query("DROP TABLE IF EXISTS carts", True)
-    run_query("DROP TABLE IF EXISTS products", True)
-    run_query("DROP TABLE IF EXISTS categories", True)
-    run_query("DROP TABLE IF EXISTS users", True)
+    # run_query("DROP TABLE IF EXISTS orders", True)
+    # run_query("DROP TABLE IF EXISTS carts", True)
+    # run_query("DROP TABLE IF EXISTS products", True)
+    # run_query("DROP TABLE IF EXISTS categories", True)
+    # run_query("DROP TABLE IF EXISTS users", True)
 
-    recreate_table_users(call_engine())
-    print("FINISHED USERS")
-    recreate_table_categories(call_engine())
-    print("FINISHED CATEGORIES")
-    recreate_table_products(call_engine())
-    print("FINISHED PRODUCTS")
-    recreate_table_carts(call_engine())
-    print("FINISHED CARTS")
-    recreate_table_payments(call_engine())
-    print("FINISHED PAYMENTS")
+    # recreate_table_users(call_engine())
+    # print("FINISHED USERS")
+    # recreate_table_categories(call_engine())
+    # print("FINISHED CATEGORIES")
+    # recreate_table_products(call_engine())
+    # print("FINISHED PRODUCTS")
+    # recreate_table_carts(call_engine())
+    # print("FINISHED CARTS")
+    # recreate_table_orders(call_engine())
+    # print("FINISHED ORDERS")
 
     return app
 

@@ -43,7 +43,7 @@ def recreate_table_categories(engine):
     categories = Table("categories", metadata,
         Column("id", String(36), primary_key=True),
         Column("name", String, unique=True, nullable=False),
-        Column("images", String),
+        Column("images", String, nullable=False),
         Column("created_at", BigInteger, server_default=text(f"{get_time_epoch()}")),
         Column("updated_at", BigInteger, onupdate=text(f"{get_time_epoch()}")),
         Column("deleted_at", BigInteger)
@@ -61,7 +61,6 @@ def recreate_table_products(engine):
         Column("id", String(36), primary_key=True),
         Column("name", String, nullable=False),
         Column("brand", String),
-        Column("size", String(1)),
         Column("detail", String),
         Column("category_id", ForeignKey(categories.c.id)),
         Column("images", ARRAY(String), unique=True),    # ["/image/image1", "/image/image2"]
@@ -84,22 +83,24 @@ def recreate_table_carts(engine):
         Column("user_id", ForeignKey(users.c.id), nullable=False),
         Column("product_id", ForeignKey(products.c.id), nullable=False),
         Column("quantity", Integer, nullable=False),
-        Column("created_at", DateTime, server_default=func.now()),
-        Column("updated_at", DateTime, onupdate=func.now()),
-        Column("deleted_at", DateTime)
+        Column("created_at", BigInteger, server_default=text(f"{get_time_epoch()}")),
+        Column("updated_at", BigInteger, onupdate=text(f"{get_time_epoch()}")),
+        Column("deleted_at", BigInteger)
     )
     metadata.create_all(engine)
 
 
-def recreate_table_payments(engine):
+def recreate_table_orders(engine):
     metadata = MetaData()
     with engine.connect() as conn:
-        conn.execute(text("DROP TABLE IF EXISTS payments"))
+        conn.execute(text("DROP TABLE IF EXISTS orders"))
 
-    payments = Table("payments", metadata,
+    orders = Table("orders", metadata,
         Column("id", String(36), primary_key=True),
         Column("user_id", ForeignKey(users.c.id), nullable=False),
         Column("shipping_method", String),
+        Column("status", String),
+        Column("created_at", BigInteger, server_default=text(f"{get_time_epoch()}")),
     )
     metadata.create_all(engine)
 
