@@ -3,9 +3,10 @@
 
 from sqlalchemy import MetaData, Table, Column, text, ForeignKey
 # datatype only
-from sqlalchemy import Integer, String, DateTime, Boolean, ARRAY, JSON
+from sqlalchemy import Integer, BigInteger, String, DateTime, Boolean, ARRAY, JSON
 from sqlalchemy.sql import func
-from utils import call_engine
+
+from utils import call_engine, get_time_epoch
 
 
 def recreate_table_users(engine):
@@ -26,9 +27,9 @@ def recreate_table_users(engine):
         Column("country", String),
         Column("city", String),
         Column("balance", Integer, server_default=text("0")),
-        Column("created_at", DateTime, server_default=func.now()),
-        Column("updated_at", DateTime, onupdate=func.now()),
-        Column("deleted_at", DateTime)
+        Column("created_at", BigInteger, server_default=text(f"{get_time_epoch()}")),
+        Column("updated_at", BigInteger, onupdate=text(f"{get_time_epoch()}")),
+        Column("deleted_at", BigInteger)
     )
     metadata.create_all(engine)
 
@@ -42,9 +43,10 @@ def recreate_table_categories(engine):
     categories = Table("categories", metadata,
         Column("id", String(36), primary_key=True),
         Column("name", String, unique=True, nullable=False),
-        Column("created_at", DateTime, server_default=func.now()),
-        Column("updated_at", DateTime, onupdate=func.now()),
-        Column("deleted_at", DateTime)
+        Column("images", String),
+        Column("created_at", BigInteger, server_default=text(f"{get_time_epoch()}")),
+        Column("updated_at", BigInteger, onupdate=text(f"{get_time_epoch()}")),
+        Column("deleted_at", BigInteger)
     )
     metadata.create_all(engine)
 
@@ -65,10 +67,9 @@ def recreate_table_products(engine):
         Column("images", ARRAY(String), unique=True),    # ["/image/image1", "/image/image2"]
         Column("price", Integer),
         Column("condition", String),        # new / used
-        # Column("stocks", Integer),          # NOTE: NEED THIS COLUMN WHEN SELLER DOESN'T HAVE AN INFINITY PRODUCT
-        Column("created_at", DateTime, server_default=func.now()),
-        Column("updated_at", DateTime, onupdate=func.now()),
-        Column("deleted_at", DateTime)
+        Column("created_at", BigInteger, server_default=text(f"{get_time_epoch()}")),
+        Column("updated_at", BigInteger, onupdate=text(f"{get_time_epoch()}")),
+        Column("deleted_at", BigInteger)
     )
     metadata.create_all(engine)
 
@@ -116,3 +117,9 @@ def recreate_table_payments(engine):
 #         # Table Column
 #     )
 #     metadata.create_all(engine)
+
+
+# NOTE for normal datetime
+#         Column("created_at", DateTime, server_default=func.now()),
+#         Column("updated_at", DateTime, onupdate=func.now()),
+#         Column("deleted_at", DateTime)

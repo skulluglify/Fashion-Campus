@@ -30,3 +30,20 @@ def run_query(query, commit: bool = False):
             conn.execute(query)
         else:
             return [dict(row) for row in conn.execute(query)]
+
+
+import time
+import calendar
+from datetime import datetime, timedelta
+
+def get_time_epoch():
+    return int(time.time())
+
+def convert_epoch_to_datetime(the_time):
+    return datetime.utcfromtimestamp(the_time) + timedelta(hours=7)
+
+def convert_datetime_to_epoch(the_time):
+    return calendar.timegm(time.strptime(str(the_time), '%Y-%m-%d %H:%M:%S'))
+
+def get_dayname_from_datetime(the_time):
+    return the_time.strftime("%a")
