@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+
+## IMPORT MY RT
+import rt.regis
+
+## REGISTRY MY PACKAGE
+rt.regis.module_registry(".modules.sqlx")
+
+## GO BOOM
+
 from flask import Flask
 
 # from route.users import users.bp
