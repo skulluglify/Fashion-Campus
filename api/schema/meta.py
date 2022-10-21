@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-from utils import call_engine
+from utils import call_engine, call_local_engine
 from sqlalchemy import MetaData, Table, Column, String, Boolean, ForeignKey, Integer, BigInteger, text
 
 def db_init():
 
-    engine = call_engine()
+    # engine = call_engine()
+    engine = call_local_engine()
 
     metadata = MetaData()
 

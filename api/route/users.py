@@ -95,24 +95,32 @@ def sign_in():
 
                 if sqlx_comp_pass(password, passcrypt):
 
-                    return jsonify({ 
-                    
-                        "user_information": {
-
+                    tokenjwt = jwt.encode(
+                        payload={
                             "name": name,
-                            "email": email,
-                            "phone_number": phone,
-                            "type": usertype,
+                            "exp": get_time_epoch_exp(4) ## just 4 hours activated
                         },
-                        "token": jwt.encode(
-                            payload={
+                        key=uuid ## uuid was randomly generated, and static
+                    )
+
+                    if u.update(uuid, token=tokenjwt):
+
+                        return jsonify({ 
+                        
+                            "user_information": {
+
                                 "name": name,
-                                "exp": get_time_epoch_exp(4) ## just 4 hours activated
+                                "email": email,
+                                "phone_number": phone,
+                                "type": usertype,
                             },
-                            key=uuid ## uuid was randomly generated, and static
-                        ),
-                        "message": "success, login success" 
-                    }), 200
+                            "token": tokenjwt,
+                            "message": "success, login success" 
+                        }), 200
+
+                    else:
+
+                        return jsonify({ "message": "error, can`t update jwt token" }), 500
 
                 return jsonify({ "message": "error, wrong password" }), 401
 
