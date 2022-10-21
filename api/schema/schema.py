@@ -3,7 +3,7 @@
 
 from sqlalchemy import MetaData, Table, Column, text, ForeignKey
 # datatype only
-from sqlalchemy import Integer, BigInteger, String, Boolean, ARRAY
+from sqlalchemy import Integer, BigInteger, String, Boolean
 from utils import call_engine
 
 
@@ -75,7 +75,7 @@ def recreate_table_products(engine):
         Column("brand", String),
         Column("detail", String),           # same as description
         Column("category_id", ForeignKey(categories.c.id)),
-        Column("images", ARRAY(String), unique=True),    # ["/image/image1", "/image/image2"]
+        Column("images", String),    # ["/image/image1", "/image/image2"]
         Column("price", Integer),
         Column("condition", String),        # new / used
         Column("is_deleted", Boolean, default=False)
