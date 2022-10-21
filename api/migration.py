@@ -15,9 +15,11 @@ if str(__name__).upper() in ("__MAIN__",):
         
     e, m = db_init()
 
-    if os.path.exists("migration.db"):
-        if os.path.isfile("migration.db"):
+    migration_db = os.path.join(os.path.dirname(__file__), "migration.db")
 
-            os.remove("migration.db")
+    if os.path.exists(migration_db):
+        if os.path.isfile(migration_db):
 
-    sqlx_migration(e, sqlx.create_engine("sqlite:///migration.db"))
+            os.remove(migration_db)
+
+    sqlx_migration(e, sqlx.create_engine("sqlite:///" + migration_db))

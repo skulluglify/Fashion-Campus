@@ -2,25 +2,30 @@ import os
 from sqlalchemy import create_engine, text
 
 def call_engine():
-    # DO NOT SHARE THIS INFORMATION, THANK YOU :D
-    # pg_creds = {
-    #     "host": "34.87.139.54",
-    #     "port": "5432",
-    #     "user": "postgres",
-    #     "pass": "asdasdasd",
-    #     "db": "FCampus",
-    # }
-    # engine_uri = "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
-    #     pg_creds["user"],
-    #     pg_creds["pass"],
-    #     pg_creds["host"],
-    #     pg_creds["port"],
-    #     pg_creds["db"],
-    # )
-    # engine = create_engine(engine_uri)
-    engine = create_engine("sqlite:///" + os.path.join(os.path.dirname(__file__), "migration.db"))
+    
+    ## DO NOT SHARE THIS INFORMATION, THANK YOU :D
+    pg_creds = {
+        "host": "34.87.139.54",
+        "port": "5432",
+        "user": "postgres",
+        "pass": "asdasdasd",
+        "db": "FCampus",
+    }
+    engine_uri = "postgresql+psycopg2://{}:{}@{}:{}/{}".format(
+        pg_creds["user"],
+        pg_creds["pass"],
+        pg_creds["host"],
+        pg_creds["port"],
+        pg_creds["db"],
+    )
+    engine = create_engine(engine_uri)
+    
     return engine
 
+def call_local_engine():
+
+    engine = create_engine("sqlite:///" + os.path.join(os.path.dirname(__file__), "migration.db"))
+    return engine
 
 def run_query(query, commit: bool = False):
     engine = call_engine()

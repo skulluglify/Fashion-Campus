@@ -17,6 +17,23 @@ from utils import PasswordChecker, check_password, get_time_epoch_exp, get_value
 
 users_bp = Blueprint("users", __name__, url_prefix="")
 
+## POST ONLY
+"""
+http://127.0.0.1:5000/sign-up
+{
+    "name": "udin",
+    "email": "udin@mail.co",
+    "phone_number": "+62 812 345 678 89",
+    "password": "Udin1234"
+}
+
+http://127.0.0.1:5000/sign-in
+{
+    "email": "udin@mail.co",
+    "password": "Udin1234"
+}
+"""
+
 @users_bp.route("/sign-up", methods=["POST"])
 def sign_up():
 
