@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 
 from utils import call_engine
-from sqlalchemy import MetaData, Table, Column, String, Boolean, ForeignKey, ARRAY, Integer, BigInteger, text
+from sqlalchemy import MetaData, Table, Column, String, Boolean, ForeignKey, Integer, BigInteger, text
 
 def db_init():
 
@@ -43,7 +43,7 @@ def db_init():
         Column("brand", String),
         Column("detail", String),           # same as description
         Column("category_id", ForeignKey(categories.c.id)),
-        Column("images", String, unique=True),    # ["/image/image1", "/image/image2"] ## /image/image1,/image/image2
+        Column("images", String),    # ["/image/image1", "/image/image2"] ## /image/image1,/image/image2
         Column("price", Integer),
         Column("condition", String),        # new / used
         Column("is_deleted", Boolean, default=False)
@@ -69,3 +69,6 @@ def db_init():
     metadata.create_all(engine, checkfirst=True)
 
     return engine, metadata
+
+## ALREADY CALLED
+engine, meta = db_init()

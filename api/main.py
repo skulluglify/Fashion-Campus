@@ -20,10 +20,12 @@ from flask import Flask
 from utils import run_query, call_engine
 from schema.schema import *
 
+from route.users import users_bp
+
 def create_app():
     app = Flask(__name__)
 
-    blueprints = []
+    blueprints = [ users_bp ]
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
 
