@@ -56,7 +56,7 @@ def sign_up():
 
                 if (not u.get(name=name)):
 
-                    if (u.put(id=sqlx_gen_uuid(), name=name, email=email, phone=email, password=sqlx_encypt_pass(password))):
+                    if (u.put(id=sqlx_gen_uuid(), name=name, email=email, phone=phone_number, password=sqlx_encypt_pass(password))):
 
                         return jsonify({ "message": "success, user created" }), 201  
 
