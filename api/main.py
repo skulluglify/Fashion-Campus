@@ -1,3 +1,16 @@
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+
+## IMPORT MY RT
+import rt.regis
+
+## REGISTRY MY PACKAGE
+rt.regis.module_registry(".modules.sqlx")
+
+## GO BOOM
+
+import os
+
 from flask import Flask
 
 # from route.users import users.bp
@@ -9,21 +22,30 @@ from flask import Flask
 from utils import run_query, call_engine
 from schema.schema import *
 
+from route.users import users_bp
+
 def create_app():
     app = Flask(__name__)
 
-    blueprints = []
+    blueprints = [ users_bp ]
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
 
     # for testing able to connect with db or not
     # go to Fashion-Campus/api then run "python3 main.py"
-    try:
-        if run_query("SELECT * FROM test")[0]['name'] == "CONNECTED":
-            print("Server Online")
-    except:
-        import sys
-        sys.exit("Server Offline") 
+
+    ## Bruh, what is that, /( -_-)/
+
+    migration_db = os.path.join(os.path.dirname(__file__), "migration.db")
+
+    if not os.path.exists(migration_db) and not os.path.isfile(migration_db):
+
+        try:
+            if run_query("SELECT * FROM test")[0]['name'] == "CONNECTED":
+                print("Server Online")
+        except:
+            import sys
+            sys.exit("Server Offline") 
 
     """ RECREATE TABLES """
     # all_table = ["orders", "carts", "products", "categories", "users", "banners"]
