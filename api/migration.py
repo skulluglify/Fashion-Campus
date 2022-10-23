@@ -2,18 +2,16 @@
 #-*- coding: utf-8 -*-
 
 import os
+from api.utils import call_engine, call_local_engine
 import rt.regis
 
 rt.regis.module_registry(".modules.sqlx")
 
-from sqlx import *
-from schema.meta import db_init
+from sqlx import sqlx_migration
 
 if str(__name__).upper() in ("__MAIN__",):
 
     ## Copyright (C) 2022 By Ahmad Asy Syafiq
-        
-    e, m = db_init()
 
     migration_db = os.path.join(os.path.dirname(__file__), "migration.db")
 
@@ -22,4 +20,4 @@ if str(__name__).upper() in ("__MAIN__",):
 
             os.remove(migration_db)
 
-    sqlx_migration(e, sqlx.create_engine("sqlite:///" + migration_db))
+    sqlx_migration(call_engine(), call_local_engine())

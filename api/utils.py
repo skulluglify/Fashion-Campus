@@ -1,4 +1,5 @@
 import os
+from typing import Union
 from sqlalchemy import create_engine, text
 
 def call_engine():
@@ -121,3 +122,72 @@ def check_password(password: str):
     if not contains_numbers:
 
         raise PasswordChecker("password must contain a number")
+
+################################################################
+
+import json
+import jwt.utils as jwtu
+
+def get_payload_jwt(token: str) -> dict:
+
+    tokens = token.split(".")
+
+    if len(tokens) == 3:
+
+        # head, body, tail = tokens
+        _, body, _ = tokens
+
+        try:
+        
+            # header = json.loads(jwtu.base64url_decode(head).decode("utf-8"))
+            payload = json.loads(jwtu.base64url_decode(body).decode("utf-8"))
+            # sig = jwtu.base64url_decode(tail)
+
+            # header["alg"] if "alg" in header else "HS256"
+            return payload
+
+        except Exception as _:
+
+            pass
+
+    return {}
+
+################################################################
+
+def is_num(value: str) -> bool:
+
+    dots: int
+    dots = 0
+
+    if len(value) > 0:
+
+        for c in value:
+
+            if c == ".":
+
+                if dots > 1:
+
+                    return False
+
+                dots += 1
+                continue
+
+            if c not in string.digits:
+
+                return False
+
+        return True
+
+    return False
+
+def parse_num(value: str, default: int = 0) -> Union[float, int]:
+
+    if not is_num(value):
+
+        return default
+
+    if value.endswith("f"):
+
+        return float(value)
+
+    return int(value)
