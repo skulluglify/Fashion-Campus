@@ -3,7 +3,7 @@ from sqlalchemy import create_engine, text
 def call_engine():
     # DO NOT SHARE THIS INFORMATION, THANK YOU :D
     pg_creds = {
-        "host": "34.87.139.54",
+        "host": "34.87.44.95",
         "port": "5432",
         "user": "postgres",
         "pass": "asdasdasd",
