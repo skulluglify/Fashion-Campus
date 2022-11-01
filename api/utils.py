@@ -1,6 +1,9 @@
 import os
-from typing import Union
+from typing import Tuple, Union, List
 from sqlalchemy import create_engine, text
+
+from sqlx.typed import drows_t
+from sqlx.base import DRow
 
 def call_engine():
     
@@ -180,6 +183,8 @@ def is_num(value: str) -> bool:
 
     return False
 
+
+## no raise
 def parse_num(value: str, default: int = 0) -> Union[float, int]:
 
     if not is_num(value):
@@ -191,3 +196,52 @@ def parse_num(value: str, default: int = 0) -> Union[float, int]:
         return float(value)
 
     return int(value)
+
+
+########################################################################
+########################################################################
+
+def is_seller(o: DRow) -> bool:
+
+    if type(o.type) is bool:
+
+        return bool(o.type)
+
+    return 0
+
+def sqlx_rows_norm_expand(data: drows_t) -> drows_t:
+
+    ## normalize
+    if type(data) not in (tuple, list):
+
+        data = [ data ]
+
+def get_images_url_from_column_images(images: str) -> List[str]:
+
+    if images != "":
+
+        return images.split(",")
+
+    return []
+
+########################################################################
+########################################################################
+
+def get_sort_rules(rules: str) -> Tuple[str, str]:
+
+    sort_column = "price"
+    sort_rule = "a_z"
+
+    sort_rules = rules.lower().split(" ")
+
+    if len(sort_rules) > 1:
+
+        sort_column, sort_rule = sort_rules
+
+    else:
+
+        sort_column = sort_rule[0]
+
+    return sort_column, sort_rule
+
+########################################################################
