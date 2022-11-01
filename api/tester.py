@@ -8,11 +8,10 @@ class COL:
     UNDERLINE = "\033[4m"
 
 
-# x = COL.__dict__.keys()
-# skip_atr = ["__module__", "__dict__", "__weakref__", "__doc__"]
-# for i in x:
-#     if i in skip_atr:
-#         continue
-#     col = getattr(COL, i) 
-#     print(f"{col}")
-# print()
+x = COL.__dict__.keys()
+skip_atr = ["__module__", "__dict__", "__weakref__", "__doc__"]
+for i in x:
+    if i in skip_atr:
+        continue
+    col = getattr(COL, i) 
+    print(f"{col}")
