@@ -13,12 +13,20 @@ if str(__name__).upper() in ("__MAIN__",):
 
     ## Copyright (C) 2022 By Ahmad Asy Syafiq
 
+    mode = "pull"
+
     migration_db = os.path.join(os.path.dirname(__file__), "migration.db")
 
-    if os.path.exists(migration_db):
-        if os.path.isfile(migration_db):
+    if mode == "pull":
 
-            os.remove(migration_db)
+        if os.path.exists(migration_db):
+            if os.path.isfile(migration_db):
 
-    sqlx_migration(call_engine(), call_local_engine())
-    # sqlx_migration(call_local_engine(), call_engine())
+                os.remove(migration_db)
+
+        sqlx_migration(call_engine(), call_local_engine())
+    
+    elif mode == "push":
+
+        sqlx_migration(call_local_engine(), call_engine())
+    

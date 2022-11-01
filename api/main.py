@@ -7,6 +7,7 @@ from flask import Flask
 import rt.regis
 rt.regis.module_registry(".modules.sqlx")
 
+from route.images import images_bp
 from route.users import users_bp
 # from route.products import products_bp
 # from route.carts import carts_bp
@@ -19,7 +20,7 @@ from schema.schema import *
 def create_app():
     app = Flask(__name__)
 
-    blueprints = [ users_bp, admin_bp ]
+    blueprints = [ images_bp, users_bp, admin_bp ]
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
 

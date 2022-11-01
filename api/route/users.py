@@ -102,9 +102,10 @@ def auth_with_token(auth: Optional[str], fn: Callable):
 
                     return jsonify({ "message": "error, token was expired" }), 400
 
-                except Exception as _:
+                ## production
+                # except Exception as _:
                     
-                    pass
+                #     pass
 
                 return jsonify({ "message": "error, something get wrong" }), 500
 
