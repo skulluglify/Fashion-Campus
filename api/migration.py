@@ -21,3 +21,4 @@ if str(__name__).upper() in ("__MAIN__",):
             os.remove(migration_db)
 
     sqlx_migration(call_engine(), call_local_engine())
+    # sqlx_migration(call_local_engine(), call_engine())

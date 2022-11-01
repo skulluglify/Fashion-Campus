@@ -1,40 +1,27 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-## IMPORT MY RT
-import rt.regis
-
-## REGISTRY MY PACKAGE
-rt.regis.module_registry(".modules.sqlx")
-
-## GO BOOM
-
 import os
-
 from flask import Flask
 
-# from route.users import users.bp
-# from route.products import products.bp
-# from route.carts import carts.bp
-# from route.admin-page import admin-page.bp
-
-# just for testing
-from utils import run_query, call_engine
-from schema.schema import *
+import rt.regis
+rt.regis.module_registry(".modules.sqlx")
 
 from route.users import users_bp
+# from route.products import products_bp
+# from route.carts import carts_bp
+from route.admin import admin_bp
+
+# # just for testing
+from utils import run_query, call_engine
+from schema.schema import *
 
 def create_app():
     app = Flask(__name__)
 
-    blueprints = [ users_bp ]
+    blueprints = [ users_bp, admin_bp ]
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
-
-    # for testing able to connect with db or not
-    # go to Fashion-Campus/api then run "python3 main.py"
-
-    ## Bruh, what is that, /( -_-)/
 
     migration_db = os.path.join(os.path.dirname(__file__), "migration.db")
 
