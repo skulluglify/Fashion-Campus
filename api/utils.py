@@ -1,5 +1,5 @@
 import os
-from typing import Tuple, Union, List
+from typing import Optional, Tuple, Union, List
 from sqlalchemy import create_engine, text
 
 from sqlx.typed import drows_t
@@ -216,6 +216,8 @@ def sqlx_rows_norm_expand(data: drows_t) -> drows_t:
 
         data = [ data ]
 
+    return data
+
 def get_images_url_from_column_images(images: str) -> List[str]:
 
     if images != "":
@@ -227,21 +229,39 @@ def get_images_url_from_column_images(images: str) -> List[str]:
 ########################################################################
 ########################################################################
 
-def get_sort_rules(rules: str) -> Tuple[str, str]:
+def get_sort_rules(rules: Optional[str]) -> Tuple[str, str]:
 
     sort_column = "price"
     sort_rule = "a_z"
 
-    sort_rules = rules.lower().split(" ")
+    if rules is not None:
+            
+        sort_rules = rules.lower().split(" ")
 
-    if len(sort_rules) > 1:
+        if len(sort_rules) > 1:
 
-        sort_column, sort_rule = sort_rules
+            sort_column, sort_rule = sort_rules
 
-    else:
+        else:
 
-        sort_column = sort_rule[0]
+            sort_column = sort_rule[0]
 
     return sort_column, sort_rule
 
 ########################################################################
+
+from sqlalchemy import Table
+from sqlalchemy.sql.elements import UnaryExpression
+
+def get_sort_columns(table: Table, column: str, rule: str) -> List[UnaryExpression]:
+
+    _sort_column = table.c.get(column)
+    
+    sort_by_column = []
+
+    if _sort_column is not None:
+    
+        sort_by_column = [ _sort_column.asc() if rule == "a_z" else _sort_column.desc() ]
+        return sort_by_column
+
+    return []
