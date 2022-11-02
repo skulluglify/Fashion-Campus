@@ -6,8 +6,8 @@ from sqlalchemy import MetaData, Table, Column, String, Boolean, ForeignKey, Int
 
 def db_init():
 
-    # engine = call_engine()
-    engine = call_local_engine()
+    engine = call_engine()
+    # engine = call_local_engine()
 
     metadata = MetaData()
 
