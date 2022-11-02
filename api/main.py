@@ -11,7 +11,7 @@ from route.images import images_bp
 from route.users import users_bp
 # from route.products import products_bp
 # from route.carts import carts_bp
-# from route.admin import admin_bp
+from route.admin import admin_bp
 
 # # just for testing
 from utils import run_query, call_engine
