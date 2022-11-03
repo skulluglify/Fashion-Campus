@@ -13,7 +13,7 @@ if str(__name__).upper() in ("__MAIN__",):
 
     ## Copyright (C) 2022 By Ahmad Asy Syafiq
 
-    mode = "push"
+    mode = "pull"
 
     migration_db = os.path.join(os.path.dirname(__file__), "migration.db")
 
