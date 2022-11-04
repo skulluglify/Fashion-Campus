@@ -28,9 +28,7 @@ def recreate_table_banners(engine):
 
 def recreate_table_users(engine):
     metadata = MetaData()
-    # with engine.connect() as conn:
-    #     conn.execute(text("DROP TABLE IF EXISTS users"))
-    
+
     global users
     users = Table("users", metadata,
         Column("id", String(36), primary_key=True),
@@ -41,7 +39,6 @@ def recreate_table_users(engine):
         Column("type", Boolean, default=False),         # False = 'buyer' AND True = 'seller'
         Column("token", String),
         Column("address", String),
-        Column("country", String),
         Column("city", String),
         Column("balance", Integer, server_default=text("0"))
     )
@@ -50,14 +47,12 @@ def recreate_table_users(engine):
 
 def recreate_table_categories(engine):
     metadata = MetaData()
-    # with engine.connect() as conn:
-    #     conn.execute(text("DROP TABLE IF EXISTS categories"))
 
     global categories
     categories = Table("categories", metadata,
         Column("id", String(36), primary_key=True),
         Column("name", String, unique=True, nullable=False),
-        Column("images", String, nullable=False),
+        Column("images", String),
         Column("is_deleted", Boolean, default=False)
     )
     metadata.create_all(engine)
@@ -65,14 +60,11 @@ def recreate_table_categories(engine):
 
 def recreate_table_products(engine):
     metadata = MetaData()
-    # with engine.connect() as conn:
-    #     conn.execute(text("DROP TABLE IF EXISTS products"))
 
     global products
     products = Table("products", metadata,
         Column("id", String(36), primary_key=True),
         Column("name", String, nullable=False),
-        Column("brand", String),
         Column("detail", String),           # same as description
         Column("category_id", ForeignKey(categories.c.id)),
         Column("images", String),    # ["/image/image1", "/image/image2"]
@@ -85,9 +77,6 @@ def recreate_table_products(engine):
 
 def recreate_table_carts(engine):
     metadata = MetaData()
-    # with engine.connect() as conn:
-    #     conn.execute(text("DROP TABLE IF EXISTS carts"))
-
     carts = Table("carts", metadata,
         Column("id", String(36), primary_key=True),
         Column("user_id", ForeignKey(users.c.id), nullable=False),
@@ -101,8 +90,6 @@ def recreate_table_carts(engine):
 
 def recreate_table_orders(engine):
     metadata = MetaData()
-    # with engine.connect() as conn:
-    #     conn.execute(text("DROP TABLE IF EXISTS orders"))
 
     orders = Table("orders", metadata,
         Column("id", String(36), primary_key=True),

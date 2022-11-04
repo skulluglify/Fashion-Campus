@@ -8,7 +8,6 @@ TODO
 (OPTIONAL) table user need edit
 """
 
-from multiprocessing import connection
 import jwt
 
 from flask import Blueprint, request, jsonify
@@ -70,6 +69,7 @@ def auth_with_token(auth: Optional[str], fn: Callable):
         algorithms = header["alg"] if "alg" in header else "HS256"
 
         payload = get_payload_jwt(auth)
+
         name = payload["name"] if "name" in payload else None
         expired = payload["exp"] if "exp" in payload else None
 
@@ -102,9 +102,10 @@ def auth_with_token(auth: Optional[str], fn: Callable):
 
                     return jsonify({ "message": "error, token was expired" }), 400
 
-                except Exception as _:
+                ## production
+                # except Exception as _:
                     
-                    pass
+                #     pass
 
                 return jsonify({ "message": "error, something get wrong" }), 500
 

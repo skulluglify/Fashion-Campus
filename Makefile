@@ -1,3 +1,9 @@
+PYTHON = python3
+
+install:
+	${PYTHON} -m pip install -r req.txt
 
 serve:
-	env PYTHONPATH=api flask --app api/main --debug run
+	env PYTHONPATH=`pwd`/api IMAGE_FOLDER=`pwd`/images ${PYTHON} -m flask --app api/main --debug run
+
+run: serve
