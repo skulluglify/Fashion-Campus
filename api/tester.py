@@ -29,9 +29,9 @@ def get_respond(route):
     x = requests.get(link)
     return x.json(), x.status_code
 
-def post_respond(route, something):
+def post_respond(route, body, header: dict = None):
     link = f"{base}{route}"
-    x = requests.post(link, json = something)
+    x = requests.post(link, json = body) if header == None else requests.post(link, json = body, headers = header)
     return x.json(), x.status_code
 
 
@@ -44,8 +44,6 @@ def test_connect():
     except:
         sp("NOT CONNECTED", "failed")
     sys.exit()
-
-test_connect()
 
 
 ## TEST ENDPOINTS ##
@@ -68,7 +66,7 @@ def test_signup():
     if respond != {"message": "error, email not valid"} and status != 400: return sp("Null Email", "failed")
     data['email'] = 'coba2@gmail.com'
     respond, status = post_respond('/sign-up', data)
-    if respond != {"message": "error, phone number not valid"} and status != 400: return sp("Null Email", "failed")
+    if respond != {"message": "error, phone number not valid"} and status != 400: return sp("Null Phone", "failed")
     data['phone_number'] = '0811111111111'
     respond, status = post_respond('/sign-up', data)
     if respond != {"message": "error, password must contain at least 8 characters"} and status != 400: return sp("Null Password", "failed")
@@ -89,8 +87,6 @@ def test_signup():
     if respond != {"message": "success, user created"} and status != 200: return sp("Create User", "failed")
     return sp("OK", "passed")
 
-test_signup()
-# run_query("DELETE FROM users WHERE name = 'coba2'",True)
 
 def test_signin():
     printe("Sign-in")
@@ -100,12 +96,53 @@ def test_signin():
     }
     respond, status = post_respond('/sign-in', data)
     if respond != {"message": "error, email not valid"} and status != 400: return sp("Null Email", "failed")
-    data['email'] = 'coba2@gmail.com'
+    data['email'] = 'admin@gmail.com'
     respond, status = post_respond('/sign-in', data)
-    if respond != {"message": "error, wrong password"} and status != 400: return sp("wrong Password", "failed")
-    data['password'] = 'aa@@AA11'
-    respond, status = post_respond('/sign-in', data)
-    if respond != {"message": "success, login success"} and status != 200: return sp("Success", "failed")
+    if respond != {"message": "error, wrong password"} and status != 400: return sp("Wrong Password", "failed")
+    data['password'] = 'admin'
+    try:
+        respond, status = post_respond('/sign-in', data)
+        if respond['message'] != "success, login success" and status != 200:
+            return sp("Failed", "failed")
+        global token
+        token = respond['token']
+        return sp("OK", "passed")
+    except:
+        return sp("Error Request", "passed")
+
+
+def test_create_category():
+    printe("Create Category")
+    global token
+    temp_token = '1234'
+    data = {
+        "category_name": ""
+    }
+    respond, status = post_respond('/categories', data, header = {"token": temp_token})
+    if respond != {"message": "error, category is null"} and status != 400: return sp("Null Category", "failed")
+    data["category_name"] = "category_testing2"
+    respond, status = post_respond('/categories', data, header = {"token": temp_token})
+    if respond != {"message": "error, invalid token"} and status != 400: return sp("Wrong Token", "failed")
+    temp_token = token
+    data["category_name"] = "category_testing"
+    respond, status = post_respond('/categories', data, header = {"token": temp_token})
+    if respond != {"message": "error, category already exists"} and status != 200: return sp("Category Exists", "failed")
+    data["category_name"] = "category_testing2"
+    respond, status = post_respond('/categories', data, header = {"token": temp_token})
+    if respond != {"message": "success, category created"} and status != 200: return sp("Create Category", "failed")
     return sp("OK", "passed")
 
-test_signin()
+
+def run_all_test():
+    global token
+    token = ''
+    test_connect()
+    test_signup()
+    test_signin() # as Admin
+    test_create_category()
+
+    # run_query("DELETE FROM users WHERE name = 'coba2'") # NOTE delete buyer coba2
+    # run_query("DELETE FROM categories WHERE name = 'category_testing2'") # NOTE delete category category_testing2
+
+
+run_all_test()
