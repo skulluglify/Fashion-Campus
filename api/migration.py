@@ -2,10 +2,10 @@
 #-*- coding: utf-8 -*-
 
 import os
-from api.utils import call_engine, call_local_engine
 import rt.regis
-
 rt.regis.module_registry(".modules.sqlx")
+
+from utils import call_engine, call_local_engine
 
 from sqlx import sqlx_migration
 
