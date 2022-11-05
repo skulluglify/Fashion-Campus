@@ -87,11 +87,11 @@ def products_page():
             images = [ images ]
 
         ## images is List<Image> as Array<String>
-        for (index, image) in enumerate(images):
+        for image in images:
 
             if type(image) is not str:
 
-                del images[index]
+                images.remove(image)
 
         ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
