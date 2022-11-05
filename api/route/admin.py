@@ -173,7 +173,7 @@ def order_page():
                     "carts.id",
                     "carts.quantity",
                     "carts.size",
-                    "carts.is_deleted",
+                    # "carts.is_deleted",
                     "products.id",
                     "products.name",
                     "products.detail",
@@ -198,6 +198,10 @@ def order_page():
                     p.table,
                     c.c.get("product_id") == p.c.get("id")
                 ),
+                
+                ## check soft delete
+                p.c.is_deleted != True,
+                
                 offset=offset,
                 size=page_size
             )
