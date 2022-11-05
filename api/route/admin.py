@@ -86,6 +86,15 @@ def products_page():
 
             images = [ images ]
 
+        ## images is List<Image> as Array<String>
+        for (index, image) in enumerate(images):
+
+            if type(image) is not str:
+
+                del images[index]
+
+        ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
         if not p.get(p.c.name == product_name):
 
             product_id = sqlx_gen_uuid()
