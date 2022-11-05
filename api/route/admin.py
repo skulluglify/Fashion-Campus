@@ -10,13 +10,14 @@ TODO
 8. Get Total Sales
 """
 
+import os
 import sqlalchemy as sqlx
-from sqlx import sqlx_easy_orm
+from sqlx import sqlx_easy_orm, sqlx_gen_uuid
 
 from flask import Blueprint, request, jsonify
 from api.route.users import auth_with_token
 from schema.meta import engine, meta
-from utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, run_query, sqlx_rows_norm_expand
+from utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, run_query, sqlx_rows_norm_expand, base64_to_image_file
 
 from typing import Callable, Optional
 
@@ -60,6 +61,66 @@ data
 }
 
 """
+
+@admin_bp.route("/products", methods=["POST"])
+def products_page():
+
+    auth = request.headers.get("authentication")
+
+    def products_page_main(userdata):
+
+        if not is_seller(userdata):
+
+            return jsonify({ "message": "error, bukan admin tidak boleh masok" }), 401
+
+        product_name = request.json.get("product_name")
+        description = request.json.get("description")
+        images = request.json.get("images") or [] ## base64 decode save as file in folder
+        condition = request.json.get("condition")
+        category_id = request.json.get("category")
+        price = parse_num(request.json.get("price"))
+
+        p = sqlx_easy_orm(engine, meta.tables.get("products"))
+
+        if type(images) is not list:
+
+            images = [ images ]
+
+        if not p.get(p.c.name == product_name):
+
+            product_id = sqlx_gen_uuid()
+
+            for (index, image) in enumerate([*images]):
+
+                im_filename = str(product_name + str(index)).replace(" ", "-")
+
+                imagepath = base64_to_image_file(im_filename, image)
+
+                if imagepath is not None:
+
+                    images[index] = os.path.join("/images/", os.path.basename(imagepath))
+                    continue
+                
+                images[index] = image
+
+            if p.post(
+                product_id, 
+                name = product_name, 
+                detail = description, 
+                category_id = category_id, 
+                images = ",".join(images),
+                price = price, 
+                condition = condition, 
+                is_deleted = False
+            ):
+
+                return jsonify({ "message": "success, product added" }), 201
+
+            return jsonify({ "message": "error, product fail added"}), 406 ## di tolak
+
+        return jsonify({ "message": "bruh, product has been added" }), 200
+
+    return auth_with_token(auth, products_page_main)
 
 @admin_bp.route("/orders", methods=["GET"])
 def order_page():

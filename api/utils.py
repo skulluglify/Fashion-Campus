@@ -157,6 +157,10 @@ def get_payload_jwt(token: str) -> dict:
 
 ################################################################
 
+def is_nan(a: Union[int, float]) -> bool:
+
+    return a != a
+
 def is_num(value: str) -> bool:
 
     dots: int
@@ -185,17 +189,28 @@ def is_num(value: str) -> bool:
 
 
 ## no raise
-def parse_num(value: str, default: int = 0) -> Union[float, int]:
+def parse_num(value: Union[str, int, float], default: int = 0) -> Union[float, int]:
 
-    if not is_num(value):
+    if type(value) is str:
 
-        return default
+        floating = False
 
-    if value.endswith("f"):
+        if value.endswith("f"):
 
-        return float(value)
+            value = value[:-1]
+            floating = True
 
-    return int(value)
+        if not is_num(value):
+
+            return default
+
+        if floating:
+
+            return float(value)
+
+        return int(value)
+
+    return value if not is_nan(value) else 0
 
 
 ########################################################################
@@ -265,3 +280,49 @@ def get_sort_columns(table: Table, column: str, rule: str) -> List[UnaryExpressi
         return sort_by_column
 
     return []
+
+from base64 import b64decode
+
+def base64_to_image_file(filename: str, context: str) -> str:
+
+    if context.startswith("data:image/"):
+
+        data = context.split(",", 1)
+
+        if len(data) > 1:
+
+            meta, b64 = data
+
+            if len(b64) > 0:
+
+                try:
+
+                    a = meta.index(":")
+                    b = meta.index(";")
+
+                    mime = meta[a+1:b]
+
+                    _, ext = mime.split("/", 1)
+
+                    imagedir = os.environ.get("IMAGE_FOLDER") or "images"
+
+                    os.makedirs(imagedir, mode=0o775, exist_ok=True)
+
+                    path = os.path.join(imagedir, filename + "." + ext)
+
+                    if not os.path.exists(path):
+
+                        buff = b64decode(b64)
+
+                        with open(path, "wb") as f:
+
+                            f.seek(0)
+                            f.write(buff)
+
+                        return path
+
+                except:
+
+                    pass
+
+    return None
