@@ -26,7 +26,7 @@ def db_init():
         Column("type", Boolean, default=False),         # False = 'buyer' AND True = 'seller'
         Column("token", String),
         Column("address", String),
-        Column("country", String),
+        # Column("country", String),
         Column("city", String),
         Column("balance", Integer, server_default=text("0"))
     )
@@ -41,7 +41,7 @@ def db_init():
     products = Table("products", metadata,
         Column("id", String(36), primary_key=True),
         Column("name", String, nullable=False),
-        Column("brand", String),
+        # Column("brand", String),
         Column("detail", String),           # same as description
         Column("category_id", ForeignKey(categories.c.id)),
         Column("images", String),    # ["/image/image1", "/image/image2"] ## /image/image1,/image/image2
