@@ -276,13 +276,13 @@ def run_all_test():
     test_connect()
     test_signup()
     test_signin() # as Admin
-    # test_get_category()
-    # test_create_category()
-    # test_update_category()
-    # test_delete_category()
-    # test_create_product()
-    # test_update_product()
-    # test_delete_product()
+    test_get_category()
+    test_create_category()
+    test_update_category()
+    test_delete_category()
+    test_create_product()
+    test_update_product()
+    test_delete_product()
 
 reset_all_data_test() # CLEARING DATA TEST FIRST
 run_all_test()
