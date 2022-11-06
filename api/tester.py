@@ -190,6 +190,8 @@ def test_delete_category():
     return sp("OK", "passed")
 
 
+### MAIN FUNCTION, DO NOT EDIT JUST COMMENT ###
+
 def reset_all_data_test():
     run_query("DELETE FROM users WHERE name = 'tester'", True)
     run_query("DELETE FROM categories WHERE name = 'category_testing%'", True)
