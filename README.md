@@ -47,7 +47,7 @@ UNIVERSAL
 
 HOME
 - [ ] Get Banner
-- [ ] Get Category
+- [ ] Get Category :ballot_box_with_check:
 
 AUTHENTICATION
 - [x] Sign-up :ballot_box_with_check:
@@ -79,10 +79,10 @@ PROFILE PAGE
 
 ADMIN PAGE
 - [ ] Get Orders
-- [ ] Create Product
-- [ ] Update Product
-- [ ] Delete Product
-- [ ] Get Category
+- [ ] Create Product :ballot_box_with_check:
+- [ ] Update Product :ballot_box_with_check:
+- [ ] Delete Product :ballot_box_with_check:
+- [ ] Get Category :ballot_box_with_check:
 - [ ] Create Category :ballot_box_with_check:
 - [ ] Update Category :ballot_box_with_check:
 - [ ] Delete Category :ballot_box_with_check:
