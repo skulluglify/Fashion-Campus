@@ -41,47 +41,47 @@ pip install -r req.txt
 # STATUS ENDPOINT & TESTER
 
 UNIVERSAL
-- [ ] [ ] Get Image
+- [ ] Get Image
 
 HOME
-- [ ] [ ] Get Banner
-- [ ] [ ] Get Category
+- [ ] Get Banner
+- [ ] Get Category
 
 AUTHENTICATION
-- [x] [x] Sign-up
-- [x] [x] Sign-in
+- [x] Sign-up :ballot_box_with_check:
+- [x] Sign-in :ballot_box_with_check:
 
 PRODUCT LIST
-- [ ] [ ] Get Product List
-- [ ] [ ] Get Category
-- [ ] [ ] Search Product by Image
+- [ ] Get Product List
+- [ ] Get Category
+- [ ] Search Product by Image
 
 PRODUCT DETAIL PAGE
-- [ ] [ ] Get Product Details
-- [ ] [ ] Add to Cart
+- [ ] Get Product Details
+- [ ] Add to Cart
 
 CART
-- [ ] [ ] Get User’s Carts
-- [ ] [ ] Get User’s Shipping Address
-- [ ] [ ] Get Shipping Price
-- [ ] [ ] Create Order
-- [ ] [ ] Delete Cart Item
+- [ ] Get User’s Carts
+- [ ] Get User’s Shipping Address
+- [ ] Get Shipping Price
+- [ ] Create Order
+- [ ] Delete Cart Item
 
 PROFILE PAGE
-- [ ] [ ] User Details
-- [ ] [ ] Change Shipping Address
-- [ ] [ ] Top-up Balance
-- [ ] [ ] Get User Balance
-- [ ] [ ] Get User Shipping Address
-- [ ] [ ] User Orders
+- [ ] User Details
+- [ ] Change Shipping Address
+- [ ] Top-up Balance
+- [ ] Get User Balance
+- [ ] Get User Shipping Address
+- [ ] User Orders
 
 ADMIN PAGE
-- [ ] [ ] Get Orders
-- [ ] [ ] Create Product
-- [ ] [ ] Update Product
-- [ ] [ ] Delete Product
-- [ ] [ ] Get Category
-- [ ] [x] Create Category
-- [ ] [x] Update Category
-- [ ] [x] Delete Category
-- [ ] [ ] Get Total Sales
+- [ ] Get Orders
+- [ ] Create Product
+- [ ] Update Product
+- [ ] Delete Product
+- [ ] Get Category
+- [ ] Create Category :ballot_box_with_check:
+- [ ] Update Category :ballot_box_with_check:
+- [ ] Delete Category :ballot_box_with_check:
+- [ ] Get Total Sales
