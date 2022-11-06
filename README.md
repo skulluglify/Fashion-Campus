@@ -30,5 +30,58 @@ pip install -r req.txt
 
 ## Run Server
 ```
-python3 main.py
+/Fashion-Campus$ make run
 ```
+
+## Run Tester
+```
+/Fashion-Campus$ make tester
+```
+
+# STATUS ENDPOINT & TESTER
+
+UNIVERSAL
+- [ ] [ ] Get Image
+
+HOME
+- [ ] [ ] Get Banner
+- [ ] [ ] Get Category
+
+AUTHENTICATION
+- [x] [x] Sign-up
+- [x] [x] Sign-in
+
+PRODUCT LIST
+- [ ] [ ] Get Product List
+- [ ] [ ] Get Category
+- [ ] [ ] Search Product by Image
+
+PRODUCT DETAIL PAGE
+- [ ] [ ] Get Product Details
+- [ ] [ ] Add to Cart
+
+CART
+- [ ] [ ] Get User’s Carts
+- [ ] [ ] Get User’s Shipping Address
+- [ ] [ ] Get Shipping Price
+- [ ] [ ] Create Order
+- [ ] [ ] Delete Cart Item
+
+PROFILE PAGE
+- [ ] [ ] User Details
+- [ ] [ ] Change Shipping Address
+- [ ] [ ] Top-up Balance
+- [ ] [ ] Get User Balance
+- [ ] [ ] Get User Shipping Address
+- [ ] [ ] User Orders
+
+ADMIN PAGE
+- [ ] [ ] Get Orders
+- [ ] [ ] Create Product
+- [ ] [ ] Update Product
+- [ ] [ ] Delete Product
+- [ ] [ ] Get Category
+- [ ] [x] Create Category
+- [ ] [x] Update Category
+- [ ] [x] Delete Category
+- [ ] [ ] Get Total Sales
