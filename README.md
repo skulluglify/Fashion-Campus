@@ -39,6 +39,8 @@ pip install -r req.txt
 ```
 
 # STATUS ENDPOINT & TESTER
+- [x] Endpoint
+:ballot_box_with_check: Tester
 
 UNIVERSAL
 - [ ] Get Image
