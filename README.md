@@ -26,6 +26,7 @@ source venv/bin/activate
 ## Install Requirements
 ```
 pip install -r req.txt
+sudo apt install make
 ```
 
 ## Run Server
