@@ -143,7 +143,7 @@ def test_create_category():
     temp_token = token
     data["category_name"] = "category_testing"
     respond, status = post_respond('/categories', data, header = {"token": temp_token})
-    if respond != {"message": "error, category already exists"} and status != 200: return sp("Category Exists")
+    if respond != {"message": "error, category already exists"} and status != 400: return sp("Category Exists")
 
     data["category_name"] = "category_testing2"
     respond, status = post_respond('/categories', data, header = {"token": temp_token})
