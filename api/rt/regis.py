@@ -18,14 +18,16 @@ def module_registry(package: str, fail_exit: bool = True) -> bool:
             ## MULTIPLE SEPARATOR
             if SEPARATOR != "":
 
-                if fail_exit:
+                if sep != SEPARATOR:
 
-                    raise ModuleNotFoundError("Couldn`t find package '%s'!" % package)
+                    if fail_exit:
 
-                return False
+                        raise ModuleNotFoundError("Couldn`t find package '%s'!" % package)
+
+                    return False
 
             SEPARATOR = sep
-            break
+            continue
 
     ## SEPARATOR NOT FOUND
     if SEPARATOR == "":
