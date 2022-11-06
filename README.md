@@ -41,7 +41,7 @@ pip install -r req.txt
 # STATUS ENDPOINT & TESTER
 
 UNIVERSAL
-- [ ] - [ ] Get Image
+- [ ] :ballot_box_with_check: Get Image
 
 HOME
 - [ ] [ ] Get Banner
