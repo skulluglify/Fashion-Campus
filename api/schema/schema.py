@@ -40,7 +40,8 @@ def recreate_table_users(engine):
         Column("token", String),
         Column("address", String),
         Column("city", String),
-        Column("balance", Integer, server_default=text("0"))
+        Column("balance", Integer, server_default=text("0")),
+        Column("address_name", String)
     )
     metadata.create_all(engine)
 

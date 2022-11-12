@@ -46,10 +46,10 @@ sudo apt install make
 :ballot_box_with_check: Tester
 
 UNIVERSAL
-- [ ] Get Image
+- [x] Get Image
 
 HOME
-- [ ] Get Banner
+- [x] Get Banner
 - [ ] Get Category :ballot_box_with_check:
 
 AUTHENTICATION
@@ -62,32 +62,32 @@ PRODUCT LIST
 - [ ] Search Product by Image
 
 PRODUCT DETAIL PAGE
-- [ ] Get Product Details
+- [x] Get Product Details
 - [ ] Add to Cart
 
 CART
 - [ ] Get User’s Carts
 - [ ] Get User’s Shipping Address
-- [ ] Get Shipping Price
-- [ ] Create Order
+- [x] Get Shipping Price
+- [x] Create Order
 - [ ] Delete Cart Item
 
 PROFILE PAGE
-- [ ] User Details
-- [ ] Change Shipping Address
-- [ ] Top-up Balance
-- [ ] Get User Balance
-- [ ] Get User Shipping Address
+- [x] User Details
+- [x] Change Shipping Address
+- [x] Top-up Balance
+- [x] Get User Balance
+- [x] Get User Shipping Address
 - [ ] User Orders
 
 ADMIN PAGE
-- [ ] Get Orders
+- [x] Get Orders
 - [ ] Get Product List
-- [ ] Create Product :ballot_box_with_check:
+- [x] Create Product :ballot_box_with_check:
 - [ ] Update Product :ballot_box_with_check:
 - [ ] Delete Product :ballot_box_with_check:
 - [ ] Get Category :ballot_box_with_check:
-- [ ] Create Category :ballot_box_with_check:
-- [ ] Update Category :ballot_box_with_check:
+- [x] Create Category :ballot_box_with_check:
+- [x] Update Category :ballot_box_with_check:
 - [ ] Delete Category :ballot_box_with_check:
 - [ ] Get Total Sales
