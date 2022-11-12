@@ -107,7 +107,8 @@ def products_page():
 
                 if imagepath is not None:
 
-                    images[index] = os.path.join("/images/", os.path.basename(imagepath))
+                    ## change route from /images to /image
+                    images[index] = os.path.join("/image/", os.path.basename(imagepath))
                     continue
                 
                 images[index] = image
@@ -207,9 +208,10 @@ def order_page():
                     p.table,
                     c.c.get("product_id") == p.c.get("id")
                 ),
-                
-                ## check soft delete
-                p.c.is_deleted != True,
+
+                ## order have checkout
+                ## no check soft delete
+                # p.c.is_deleted != True,
                 
                 offset=offset,
                 size=page_size

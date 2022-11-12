@@ -4,7 +4,7 @@
 import os
 from flask import Blueprint, jsonify, send_from_directory
 
-images_bp = Blueprint("images", __name__, url_prefix="/images")
+images_bp = Blueprint("images", __name__, url_prefix="/image")
 
 @images_bp.route("/<path:image_id>", methods=["GET"])
 def images_page(image_id):
