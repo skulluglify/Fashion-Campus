@@ -236,7 +236,7 @@ def user_info():
             "phone_number": userdata.phone,
             "type": "seller" if userdata.type else "buyer",
             "address": userdata.address,
-            "country": userdata.country,
+            # "country": userdata.country,
             "city": userdata.city,
             "balance": userdata.balance,
             "message": "success, authorized"

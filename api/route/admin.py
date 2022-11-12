@@ -207,9 +207,10 @@ def order_page():
                     p.table,
                     c.c.get("product_id") == p.c.get("id")
                 ),
-                
-                ## check soft delete
-                p.c.is_deleted != True,
+
+                ## order have checkout
+                ## no check soft delete
+                # p.c.is_deleted != True,
                 
                 offset=offset,
                 size=page_size
