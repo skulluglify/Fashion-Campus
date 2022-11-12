@@ -9,18 +9,19 @@ rt.regis.module_registry(".modules.sqlx")
 
 from route.images import images_bp
 from route.users import users_bp
-# from route.products import products_bp
+from route.products import products_bp
 # from route.carts import carts_bp
 from route.admin import admin_bp
+from route.home import home_bp
 
 # # just for testing
-from utils import run_query, call_engine
+from utils import run_query
 from schema.schema import *
 
 def create_app():
     app = Flask(__name__)
 
-    blueprints = [ images_bp, users_bp, admin_bp ]
+    blueprints = [ images_bp, users_bp, products_bp, admin_bp, home_bp ]
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
 

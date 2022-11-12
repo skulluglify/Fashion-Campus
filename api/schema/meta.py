@@ -26,6 +26,7 @@ def db_init():
         Column("type", Boolean, default=False),         # False = 'buyer' AND True = 'seller'
         Column("token", String),
         Column("address", String),
+        # Column("address_name", String),
         # Column("country", String),
         Column("city", String),
         Column("balance", Integer, server_default=text("0"))

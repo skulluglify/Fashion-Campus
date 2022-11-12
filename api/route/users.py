@@ -256,7 +256,7 @@ def user_ship_address():
         if request.method == "GET":
 
             data = {
-                "name": userdata.name,
+                "name": userdata.address_name,
                 "phone_number": userdata.phone,
                 "address": userdata.address,
                 "city": userdata.city,
@@ -281,7 +281,7 @@ def user_ship_address():
                 data = {}
 
                 ## FILTERING DATA, ONLY CATCH name, phone_number, address, city
-                if name is not None: data["name"] = name
+                if name is not None: data["address_name"] = name
                 if phone_number is not None: data["phone"] = phone_number
                 if address is not None: data["address"] = address
                 if country is not None: data["country"] = country
@@ -304,6 +304,17 @@ def user_ship_address():
         return jsonify({ "message": "success, nothing todo" }), 200
 
     return auth_with_token(auth, user_ship_address_main)
+
+@users_bp.route("/user/balance", methods=["GET"])
+def user_balance_detail():
+
+    auth = request.headers.get("authentication")
+
+    def user_balance_detail_main(userdata):
+
+        return jsonify({ "message": "success, get user balance", "data": { "balance": userdata.balance or 0 } }), 200
+
+    return auth_with_token(auth, user_balance_detail_main)
 
 @users_bp.route("/user/balance", methods=["POST"])
 def user_topup():

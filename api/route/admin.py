@@ -107,7 +107,8 @@ def products_page():
 
                 if imagepath is not None:
 
-                    images[index] = os.path.join("/images/", os.path.basename(imagepath))
+                    ## change route from /images to /image
+                    images[index] = os.path.join("/image/", os.path.basename(imagepath))
                     continue
                 
                 images[index] = image
