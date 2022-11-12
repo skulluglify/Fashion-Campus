@@ -1,5 +1,7 @@
 # Fashion-Campus
 Final Project Startup Campus Track BE x AI
+API requirement : https://docs.google.com/presentation/d/1e5XoOiWgGf6WTeNXdpfNdMN9_R_Q9FftgHjzigaCoYo/edit?usp=share_link
+Project Progress : https://docs.google.com/spreadsheets/d/1whBKn8omWPQhWK7Q97opmVig0BBWrpyZ_74Cfddj_k4/edit?usp=sharing
 
 ### RULES
 - Master **NO PUSH NO MERGE**
@@ -80,6 +82,7 @@ PROFILE PAGE
 
 ADMIN PAGE
 - [ ] Get Orders
+- [ ] Get Product List
 - [ ] Create Product :ballot_box_with_check:
 - [ ] Update Product :ballot_box_with_check:
 - [ ] Delete Product :ballot_box_with_check:
