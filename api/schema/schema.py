@@ -84,7 +84,7 @@ def recreate_table_carts(engine):
         Column("product_id", ForeignKey(products.c.id), nullable=False),
         Column("quantity", Integer, nullable=False),
         Column("size", String, nullable=False),
-        Column("is_deleted", Boolean, default=False)
+        Column("is_ordered", Boolean, default=False)
     )
     metadata.create_all(engine)
 
@@ -96,6 +96,10 @@ def recreate_table_orders(engine):
         Column("id", String(36), primary_key=True),
         Column("user_id", ForeignKey(users.c.id), nullable=False),
         Column("shipping_method", String),
+        Column("name", String),
+        Column("phone", String),
+        Column("address", String),
+        Column("city", String),
         Column("status", String, default="waiting"),
         Column("created_at", BigInteger, nullable=False)
     )
