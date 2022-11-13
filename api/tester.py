@@ -116,7 +116,7 @@ def test_signin():
 
     try:
         respond, status = post_respond('/sign-in', data)
-        if respond['message'] != "Login success" and status != 200: return sp("Failed Login")
+        if respond['message'] != "success, login success" and status != 200: return sp("Failed Login")
         global token
         token = respond['token']
         return sp("OK", "passed")

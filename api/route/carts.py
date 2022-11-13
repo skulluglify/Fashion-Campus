@@ -17,6 +17,16 @@ from api.route.users import auth_with_token
 
 carts_bp = Blueprint("carts", __name__, url_prefix="/")
 
+# NOTE NOT DONE
+
+# @carts_bp.route("/cart", methods=["GET"])
+# def add_to_cart():
+#     auth = request.headers.get("authentication")
+#     def add_cart():
+#         pass
+#     return auth_with_token(auth, add_cart())
+
+
 def get_shipping_prices(userdata: DRow):
 
     c = sqlx_easy_orm(engine, meta.tables.get("carts"))
