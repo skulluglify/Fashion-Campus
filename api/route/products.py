@@ -38,18 +38,18 @@ def get_products():
     except:
         pass
     try:
-        body_category = body["category"]
+        body_category = body["category"].split(",")
     except:
-        pass
+        return jsonify({ "message": "error, category not valid" }), 400
     try:
         body_price = body["price"]
-        min_price, max_price = [int(x) for x in body_price.split(", ")]
+        min_price, max_price = [int(x) for x in body_price.split(",")]
     except:
         pass
     try:
         body_condition = body["condition"].lower()
     except:
-        pass
+        return jsonify({ "message": "error, condition not valid" }), 400
     try:
         body_product_name = body["product_name"]
     except:
@@ -63,18 +63,24 @@ def get_products():
             if single_data[i]["name"] != body_product_name:
                 data[i] = "KOSONG"
                 continue
+
         if body_price != None:
             if min_price <= single_data[i]["price"] <= max_price:
                 pass
             else:
                 data[i] = "KOSONG"
                 continue
-        if body_condition != None:
+
+        if len(body_condition) > 5:
+            pass
+        else:
             if single_data[i]["condition"].lower() != body_condition:
                 data[i] = "KOSONG"
                 continue
 
-        # CONDITION CATEGORY
+        if single_data[i]["category_id"] not in body_category:
+            data[i] = "KOSONG"
+            continue
 
     data = set(data)
     data.remove("KOSONG")
