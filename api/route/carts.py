@@ -17,16 +17,6 @@ from api.route.users import auth_with_token
 
 carts_bp = Blueprint("carts", __name__, url_prefix="/")
 
-# NOTE NOT DONE
-
-# @carts_bp.route("/cart", methods=["GET"])
-# def add_to_cart():
-#     auth = request.headers.get("authentication")
-#     def add_cart():
-#         pass
-#     return auth_with_token(auth, add_cart())
-
-
 def get_shipping_prices(userdata: DRow):
 
     c = sqlx_easy_orm(engine, meta.tables.get("carts"))
@@ -86,6 +76,33 @@ def get_shipping_prices(userdata: DRow):
             return data, total
 
     return [], 0
+
+
+@carts_bp.route("/cart", methods=["GET"])
+def get_cart():
+    auth = request.headers.get("authentication")
+    
+    def get_cart(userdata):
+        raw_data = run_query(f"SELECT id, quantity, size, product_id FROM carts WHERE user_id = '{userdata.id}' AND is_ordered != 'true'")
+        data = []
+        for item in raw_data:
+            product_id = item["product_id"]
+            prd_dtl = run_query(f"SELECT products.price, products.name, products.images FROM products JOIN categories ON products.category_id = categories.id WHERE products.is_deleted != 'true' AND categories.is_deleted != 'true' AND products.id = '{product_id}'")
+            req = {
+                "id": item["id"],
+                "details": {
+                    "quantity": item["quantity"],
+                    "size": item["size"]
+                },
+                "price": prd_dtl[0]["price"],
+                "image": prd_dtl[0]["images"],
+                "name": prd_dtl[0]["name"]
+            }
+            data.append(req)
+        return data, 200
+
+    return auth_with_token(auth, get_cart)
+
 
 @carts_bp.route("/shipping_price", methods=["GET"])
 def shipping_price_page():
