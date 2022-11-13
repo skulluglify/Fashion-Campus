@@ -77,6 +77,47 @@ def get_shipping_prices(userdata: DRow):
 
     return [], 0
 
+
+@carts_bp.route("/cart", methods=["GET"])
+def get_cart():
+    auth = request.headers.get("authentication")
+
+    def get_cart_main(userdata):
+        raw_data = run_query(f"SELECT id, quantity, size, product_id FROM carts WHERE user_id = '{userdata.id}' AND is_ordered != 'true'")
+        data = []
+        for item in raw_data:
+            product_id = item["product_id"]
+            prd_dtl = run_query(f"SELECT products.price, products.name, products.images FROM products JOIN categories ON products.category_id = categories.id WHERE products.is_deleted != 'true' AND categories.is_deleted != 'true' AND products.id = '{product_id}'")
+            req = {
+                "id": item["id"],
+                "details": {
+                    "quantity": item["quantity"],
+                    "size": item["size"]
+                },
+                "price": prd_dtl[0]["price"],
+                "image": prd_dtl[0]["images"],
+                "name": prd_dtl[0]["name"]
+            }
+            data.append(req)
+        return data, 200
+
+    return auth_with_token(auth, get_cart_main)
+
+
+@carts_bp.route("/cart/<string:cart_id>", methods=["DELETE"])
+def delete_cart(cart_id):
+    auth = request.headers.get("authentication")
+    
+    delete_cart_main(cart_id):
+        try:
+            run_query(f"DELETE FROM carts WHERE id = '{cart_id}'", True)
+        except:
+            return jsonify({ "message": "error, item not valid"}), 400
+        return jsonify({ "message": "Cart deleted"}), 200
+
+    return auth_with_token(auth, delete_cart_main)
+
+
 @carts_bp.route("/shipping_price", methods=["GET"])
 def shipping_price_page():
 

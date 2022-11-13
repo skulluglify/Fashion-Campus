@@ -116,7 +116,7 @@ def test_signin():
 
     try:
         respond, status = post_respond('/sign-in', data)
-        if respond['message'] != "Login success" and status != 200: return sp("Failed Login")
+        if respond['message'] != "success, login success" and status != 200: return sp("Failed Login")
         global token
         token = respond['token']
         return sp("OK", "passed")
@@ -128,7 +128,7 @@ def test_get_category():
     printe("Get Category")
     respond, status = get_respond('/home/category')
     for i in respond['data']:
-        if i['id'] == 'category_testing' and i['name'] == 'category_testing':
+        if i['id'] == 'category_testing' and i['title'] == 'category_testing':
             return sp("OK", "passed")
     return sp("Failed")
 
@@ -273,16 +273,16 @@ def reset_all_data_test():
 def run_all_test():
     global token
     token = ''
-    test_connect()
-    test_signup()
-    test_signin() # as Admin
+    # test_connect()
+    # test_signup()
+    # test_signin() # as Admin
     test_get_category()
-    test_create_category()
-    test_update_category()
-    test_delete_category()
-    test_create_product()
-    test_update_product()
-    test_delete_product()
+    # test_create_category()
+    # test_update_category()
+    # test_delete_category()
+    # test_create_product()
+    # test_update_product()
+    # test_delete_product()
 
 reset_all_data_test() # CLEARING DATA TEST FIRST
 run_all_test()

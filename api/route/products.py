@@ -10,9 +10,101 @@ import sqlalchemy as sqlx
 from flask import Blueprint, request, jsonify
 from schema.meta import engine, meta
 from sqlx import sqlx_easy_orm
-from utils import get_images_url_from_column_images
+from utils import get_images_url_from_column_images, run_query
 
 products_bp = Blueprint("products", __name__, url_prefix="/")
+
+@products_bp.route("/home/category", methods=["GET"])
+def get_category():
+    data = run_query("SELECT id, images, name as title FROM categories WHERE NOT is_deleted='true'")
+    data = {"data": data}
+    return jsonify(data), 200
+
+
+@products_bp.route("/products", methods=["GET"])
+def get_products():
+    body = request.args
+    body_sort_by, body_category, body_price, body_condition, body_product_name = "Price a_z", None, None, None, None, None, None
+    try:
+        body_page = body["page"]
+    except:
+        return jsonify({ "message": "error, page not valid" }), 400
+    try:
+        body_page_size = body["body_page_size"]
+    except:
+        return jsonify({ "message": "error, page size not valid" }), 400
+    try:
+        body_sort_by = body["sort_by"]
+    except:
+        pass
+    try:
+        body_category = body["category"].split(",")
+    except:
+        return jsonify({ "message": "error, category not valid" }), 400
+    try:
+        body_price = body["price"]
+        min_price, max_price = [int(x) for x in body_price.split(",")]
+    except:
+        pass
+    try:
+        body_condition = body["condition"].lower()
+    except:
+        return jsonify({ "message": "error, condition not valid" }), 400
+    try:
+        body_product_name = body["product_name"]
+    except:
+        pass
+
+    data = run_query(f"SELECT * FROM products WHERE NOT is_deleted='true' AND category_id = ANY(SELECT id FROM categories WHERE NOT is_deleted='true')")
+    
+    for i in range(len(data)):
+        single_data = data[i]
+        if body_product_name != None:
+            if single_data[i]["name"] != body_product_name:
+                data[i] = "KOSONG"
+                continue
+
+        if body_price != None:
+            if min_price <= single_data[i]["price"] <= max_price:
+                pass
+            else:
+                data[i] = "KOSONG"
+                continue
+
+        if len(body_condition) > 5:
+            pass
+        else:
+            if single_data[i]["condition"].lower() != body_condition:
+                data[i] = "KOSONG"
+                continue
+
+        if single_data[i]["category_id"] not in body_category:
+            data[i] = "KOSONG"
+            continue
+
+    data = set(data)
+    data.remove("KOSONG")
+    
+    if body_sort_by[-1] == 'z':
+        data.sort(key = lambda x: x["price"])
+    else:
+        data.sort(key = lambda x: x["price"], reverse=True)
+    
+    data = [{"id": item["id"], "image": item["images"], "title": item["name"], "price": item["price"]} for item in data]
+
+    def divide_chunks(l, n):
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
+
+    separated_data = list(divide_chunks(data, body_page_size))
+    
+    try:
+        final_data = {"data": separated_data[int(body_page) - 1], "total_rows": len(data)}
+    except:
+        return jsonify({ "message": "error, page not found" }), 400    
+
+    return jsonify(final_data_req), 200
+
 
 @products_bp.route("/products/search_image", methods=["POST"])
 def search_image_page():
