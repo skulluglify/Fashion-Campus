@@ -162,6 +162,12 @@ def order_page():
 
                         return jsonify({ "message": "error, shipping_address.city not found" }), 400
 
+                    ## -- useless --
+                    ## name
+                    ## phone_number
+                    ## address
+                    ## city
+
                     cost = total + shipping_price_info["price"]
 
                     o = sqlx_easy_orm(engine, meta.tables.get("orders"))
@@ -178,11 +184,11 @@ def order_page():
                         ## DEBUG
                         ## DEBUG
 
-                        if u.update(buyer.id, balance=buyer.balance - cost, verify=True):
+                        if u.update(buyer.id, balance=buyer.balance - cost):
 
                             seller = u.get(type=True)
 
-                            if u.update(seller.id, balance=seller.balance + cost, verify=True):
+                            if u.update(seller.id, balance=seller.balance + cost):
 
                                 return jsonify({ "message": "Order success" }), 200
 
