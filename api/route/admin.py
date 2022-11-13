@@ -95,6 +95,12 @@ def products_page():
 
         ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+        ## default condition
+
+        if type(condition) is None:
+
+            condition = "New"
+
         if not p.get(p.c.name == product_name):
 
             product_id = sqlx_gen_uuid()
@@ -112,6 +118,10 @@ def products_page():
                     continue
                 
                 images[index] = image
+
+            if type(condition) is str:
+
+                condition = condition.lower()
 
             if p.post(
                 product_id, 
@@ -131,6 +141,123 @@ def products_page():
         return jsonify({ "message": "bruh, product has been added" }), 200
 
     return auth_with_token(auth, products_page_main)
+
+@admin_bp.route("/products", methods=["PUT"])
+def products_update_page():
+
+    """
+    product_name Product 1
+    
+    description Lorem ipsum
+    
+    images [image_1, image_2, image_3]
+    
+    condition new
+    
+    category category_id
+    
+    price 10000
+
+    product_id product_id
+    """
+
+    auth = request.headers.get("authentication")
+
+    def products_update_page_main(userdata):
+
+        if not is_seller(userdata):
+
+            return jsonify({ "message": "error, bukan admin tidak boleh masok" }), 401
+
+        product_name = request.json.get("product_name")
+        description = request.json.get("description")
+        images = request.json.get("images") or [] ## base64 decode save as file in folder
+        condition = request.json.get("condition")
+        category_id = request.json.get("category")
+        product_id = request.json.get("product_id")
+
+        if type(product_id) is not str \
+            or product_id == '':
+            
+            return jsonify({ "message": "error, product_id not found" }), 400
+
+        price = parse_num(request.json.get("price"))
+
+        p = sqlx_easy_orm(engine, meta.tables.get("products"))
+
+        if type(images) is not list:
+
+            images = [ images ]
+
+        ## images is List<Image> as Array<String>
+        for image in images:
+
+            if type(image) is not str:
+
+                images.remove(image)
+
+        ##>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+        product = p.get(product_id)
+
+        if product is not None:
+
+            for (index, image) in enumerate([*images]):
+
+                im_filename = str(product_name + str(index)).replace(" ", "-")
+
+                imagepath = base64_to_image_file(im_filename, image)
+
+                if imagepath is not None:
+
+                    ## change route from /images to /image
+                    images[index] = os.path.join("/image/", os.path.basename(imagepath))
+                    continue
+                
+                images[index] = image
+
+            if type(product_name) is None:
+
+                product_name = product.name
+
+            if type(description) is None:
+
+                description = product.description
+
+            if type(images) is None \
+                or not images:
+
+                images = get_images_url_from_column_images(product.images)
+
+            if type(price) is None:
+                
+                price = product.price
+
+            if type(condition) is None:
+
+                condition = product.condition
+
+            if type(condition) is str:
+
+                condition = condition.lower()
+
+            if p.update(
+                product_id, 
+                name = product_name, 
+                detail = description, 
+                category_id = category_id, 
+                images = ",".join(images),
+                price = price, 
+                condition = condition
+            ):
+
+                return jsonify({ "message": "success, product update" }), 201
+
+            return jsonify({ "message": "error, product fail update"}), 406 ## di tolak
+
+        return jsonify({ "message": "bruh, product unknown" }), 200
+
+    return auth_with_token(auth, products_update_page_main)
 
 @admin_bp.route("/orders", methods=["GET"])
 def order_page():
