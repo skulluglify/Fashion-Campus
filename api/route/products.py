@@ -51,7 +51,7 @@ def search_image_page():
 
     return jsonify({ "message": "error, gagal pencarian gambar" }), 400
 
-@products_bp.route("/products/<string:product_id>", methods=["POST"])
+@products_bp.route("/products/<string:product_id>", methods=["GET"])
 def product_detail_page(product_id):
 
     """
