@@ -81,8 +81,8 @@ def get_shipping_prices(userdata: DRow):
 @carts_bp.route("/cart", methods=["GET"])
 def get_cart():
     auth = request.headers.get("authentication")
-    
-    def get_cart(userdata):
+
+    def get_cart_main(userdata):
         raw_data = run_query(f"SELECT id, quantity, size, product_id FROM carts WHERE user_id = '{userdata.id}' AND is_ordered != 'true'")
         data = []
         for item in raw_data:
@@ -101,7 +101,21 @@ def get_cart():
             data.append(req)
         return data, 200
 
-    return auth_with_token(auth, get_cart)
+    return auth_with_token(auth, get_cart_main)
+
+
+@carts_bp.route("/cart/<string:cart_id>", methods=["DELETE"])
+def delete_cart(cart_id):
+    auth = request.headers.get("authentication")
+    
+    delete_cart_main(cart_id):
+        try:
+            run_query(f"DELETE FROM carts WHERE id = '{cart_id}'", True)
+        except:
+            return jsonify({ "message": "error, item not valid"}), 400
+        return jsonify({ "message": "Cart deleted"}), 200
+
+    return auth_with_token(auth, delete_cart_main)
 
 
 @carts_bp.route("/shipping_price", methods=["GET"])
