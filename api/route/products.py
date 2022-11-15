@@ -10,7 +10,7 @@ import sqlalchemy as sqlx
 from flask import Blueprint, request, jsonify
 from schema.meta import engine, meta
 from sqlx import sqlx_easy_orm
-from utils import get_images_url_from_column_images, run_query
+from api.utils import get_images_url_from_column_images, run_query
 
 products_bp = Blueprint("products", __name__, url_prefix="/")
 
@@ -103,7 +103,7 @@ def get_products():
     except:
         return jsonify({ "message": "error, page not found" }), 400    
 
-    return jsonify(final_data_req), 200
+    return jsonify(final_data), 200
 
 
 @products_bp.route("/products/search_image", methods=["POST"])
