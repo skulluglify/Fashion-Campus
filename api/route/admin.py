@@ -15,11 +15,9 @@ import sqlalchemy as sqlx
 from sqlx import sqlx_easy_orm, sqlx_gen_uuid
 
 from flask import Blueprint, request, jsonify
-from api.route.users import auth_with_token
+from .supports import auth_with_token
 from schema.meta import engine, meta
-from utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, run_query, sqlx_rows_norm_expand, base64_to_image_file
-
-from typing import Callable, Optional
+from api.utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, sqlx_rows_norm_expand, base64_to_image_file, convert_epoch_to_datetime
 
 admin_bp = Blueprint("admin", __name__, url_prefix="")
 
@@ -287,8 +285,8 @@ def order_page():
 
         ##
 
-        page = parse_num(_page)
-        page_size = parse_num(_page_size)
+        page = parse_num(_page) or 1
+        page_size = parse_num(_page_size) or 1
 
         o = sqlx_easy_orm(engine, meta.tables.get("orders"))
         c = sqlx_easy_orm(engine, meta.tables.get("carts"))
@@ -302,10 +300,12 @@ def order_page():
 
             orders = o.get(
                 [
+                    "orders.id",
                     "orders.shipping_method",
                     "orders.status",
                     "orders.created_at",
                     "users.id",
+                    "users.name",
                     "users.email",
                     "carts.id",
                     "carts.quantity",
@@ -339,6 +339,8 @@ def order_page():
                 ## order have checkout
                 ## no check soft delete
                 # p.c.is_deleted != True,
+
+                c.c.is_ordered == True,
                 
                 offset=offset,
                 size=page_size
@@ -376,14 +378,13 @@ def order_page():
 
                 status = order.status
                 shipping_method = order.shipping_method
-                created_at = order.created_at
+                created_at = convert_epoch_to_datetime(order.created_at)
 
 
                 user = order.users
                 user_id = user.id
 
                 cart = order.carts
-                cart_id = cart.id
                 cart_quantity = cart.quantity
                 # size = cart.size or [ "S", "M", "L" ]
                 # size = cart.size or [ "?" ]
@@ -398,9 +399,25 @@ def order_page():
 
                 images_url = get_images_url_from_column_images(product.images)
 
+                """
+                    {
+                        "data": [
+                        {
+                            "id": "order_id(uuid)",
+                            "user_name": "nama user",
+                            "created_at": "Tue, 25 august 2022",
+                            "user_id": "uuid",
+                            "user_email": "user@gmail.com",
+                            "total": 1000
+                        }
+                        ]
+                    }
+                """
+
                 data += [
                     {
-                        "id": cart_id,
+                        "id": order.id,
+                        "user_name": user.name,
                         "title": product_title,
                         "size": size,
                         "price": product_price,
@@ -409,9 +426,11 @@ def order_page():
                         "product_detail": product_detail,
                         "shipping_method": shipping_method,
                         "shipping_status": status,
+                        "status": status,
                         "method": shipping_method,
                         "status": status,
                         "email": user_email,
+                        "user_email": user_email,
                         "images_url": images_url,
                         "user_id": user_id,
                         "total": product_total,

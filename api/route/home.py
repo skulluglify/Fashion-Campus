@@ -5,7 +5,7 @@
 from flask import Blueprint, jsonify
 from schema.meta import engine, meta
 from sqlx import sqlx_easy_orm
-from utils import sqlx_rows_norm_expand, get_images_url_from_column_images
+from api.utils import sqlx_rows_norm_expand, get_images_url_from_column_images
 
 home_bp = Blueprint("home", __name__, url_prefix="/home")
 
