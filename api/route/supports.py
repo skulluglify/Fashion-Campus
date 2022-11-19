@@ -58,6 +58,8 @@ def auth_with_token(auth: Optional[str], fn: Callable):
 
                 except Exception as _:
 
+                    print(_)
+
                     return jsonify({ "message": "error, something get wrong" }), 500
 
             return jsonify({ "message": "error, user not found" }), 400

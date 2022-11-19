@@ -298,7 +298,7 @@ def order_page():
             offset: int
             offset = (page - 1) * page_size
 
-            orders = o.get(
+            rows = o.getall(
                 [
                     "orders.id",
                     "orders.shipping_method",
@@ -346,10 +346,10 @@ def order_page():
                 size=page_size
             )
 
-            orders = sqlx_rows_norm_expand(orders)
+            rows = sqlx_rows_norm_expand(rows)
 
             ## jika data orders kosong
-            if orders is None or not orders:
+            if rows is None or not rows:
 
                 return jsonify({
 
@@ -357,12 +357,9 @@ def order_page():
                     "data": []
                 }), 200
 
-            ## normalize
-            orders = sqlx_rows_norm_expand(orders)
-
             data = []
 
-            for order in orders:
+            for order in rows:
 
                 # id
                 # title
