@@ -24,7 +24,7 @@ def get_category():
 @products_bp.route("/products", methods=["GET"])
 def get_products():
     body = request.args
-    body_sort_by, body_category, body_price, body_condition, body_product_name = "Price a_z", None, None, None, None, None, None
+    body_sort_by, body_category, body_price, body_condition, body_product_name = "Price a_z", None, None, None, None
     try:
         body_page = body["page"]
     except:
