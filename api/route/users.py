@@ -15,7 +15,7 @@ from flask import Blueprint, request, jsonify
 from api.valid import Validation
 from schema.meta import engine, meta
 from sqlx import sqlx_gen_uuid, sqlx_encypt_pass, sqlx_comp_pass, sqlx_easy_orm
-from api.utils import PasswordChecker, check_password, get_time_epoch_exp, get_value, get_time_epoch, parse_num, get_sort_columns, get_sort_rules, convert_epoch_to_datetime, get_images_url_from_column_images
+from api.utils import PasswordChecker, check_password, get_time_epoch_exp, get_value, get_time_epoch, parse_num, get_sort_columns, get_sort_rules, convert_epoch_to_datetime, get_images_url_from_column_images, sqlx_rows_norm_expand
 from .supports import auth_with_token, get_shipping_prices
 
 users_bp = Blueprint("users", __name__, url_prefix="")
@@ -200,6 +200,7 @@ def user_ship_address():
         if request.method == "GET":
 
             data = {
+                "id": userdata.id,
                 "name": userdata.address_name,
                 "phone_number": userdata.phone,
                 "address": userdata.address,
@@ -346,7 +347,7 @@ def user_order():
 
         if shipping_price <= 0:
 
-            return jsonify({ "message", "error, shipping method not found" }), 400
+            return jsonify({ "message": "error, shipping method not found" }), 400
 
         total += shipping_price
 
@@ -364,7 +365,7 @@ def user_order():
 
                         if not c.update(cart.id, is_ordered=True):
 
-                            return jsonify({ "message": "success, cart cannot update data" }), 500
+                            return jsonify({ "message": "error, cart cannot update data" }), 500
 
                     return jsonify({ "message": "success, order was successful" }), 200
 
@@ -378,7 +379,7 @@ def user_order():
 
 ## symlink
 users_bp.route("/order", methods=["POST"])(user_order)
-users_bp.route("/user/order", methods=["POST"])(user_order)
+# users_bp.route("/user/order", methods=["POST"])(user_order)
 
 def user_get_order():
 
@@ -403,6 +404,13 @@ def user_get_order():
 
         offset: int
         offset = (page - 1) * page_size
+
+        obj_limit = {}
+
+        if _page_size is not None:
+
+            obj_limit["offset"] = offset
+            obj_limit["size"] = page_size
 
         """
         [
@@ -471,9 +479,10 @@ def user_get_order():
 
             j,
 
-            offset=offset,
-            size=page_size
+            **obj_limit
         )
+
+        rows = sqlx_rows_norm_expand(rows)
 
         for row in rows:
 
@@ -569,5 +578,5 @@ def user_get_order():
     return auth_with_token(auth, user_get_order_main)
 
 ## symlink
-users_bp.route("/order", methods=["GET"])(user_get_order)
+# users_bp.route("/order", methods=["GET"])(user_get_order)
 users_bp.route("/user/order", methods=["GET"])(user_get_order)

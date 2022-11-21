@@ -5,7 +5,7 @@
 from flask import Blueprint, jsonify
 from schema.meta import engine, meta
 from sqlx import sqlx_easy_orm
-from api.utils import sqlx_rows_norm_expand, get_images_url_from_column_images
+from api.utils import sqlx_rows_norm_expand, get_images_url_from_column_images, rows_info_exclude_table_info
 
 home_bp = Blueprint("home", __name__, url_prefix="/home")
 
@@ -19,6 +19,8 @@ def banner_page():
     rows = sqlx_rows_norm_expand(rows)
 
     if rows is not None:
+
+        rows = rows_info_exclude_table_info(rows)
 
         return jsonify({ "message": "success, banner found", "data": rows }), 200
 

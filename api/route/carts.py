@@ -131,6 +131,6 @@ def shipping_price_page():
 
             return jsonify({ "message": "success, shipping_price found", "data": data }), 200
 
-        return jsonify({ "message": "error, tidak bisa mengambil metode harga"}), 400
+        return jsonify({ "message": "error, cart kosong"}), 400
 
     return auth_with_token(auth, shipping_price_page_main)
