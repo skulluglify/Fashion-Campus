@@ -29,6 +29,12 @@ def create_app():
 
 app = create_app()
 
+@app.after_request
+def apply_caching(request):
+
+    request.headers["Access-Control-Allow-Origin"] = "*"
+    return request
+
 @app.route("/")
 def test():
     try:
