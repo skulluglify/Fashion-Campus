@@ -326,3 +326,7 @@ def base64_to_image_file(filename: str, context: str) -> str:
                     pass
 
     return None
+
+def rows_info_exclude_table_info(rows: List[dict]) -> List[dict]:
+
+    return [ dict([ (k.split(".").pop(), v) for (k, v) in row.items() ]) for row in rows ]

@@ -15,11 +15,9 @@ import sqlalchemy as sqlx
 from sqlx import sqlx_easy_orm, sqlx_gen_uuid
 
 from flask import Blueprint, request, jsonify
-from api.route.users import auth_with_token
+from .supports import auth_with_token
 from schema.meta import engine, meta
-from utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, run_query, sqlx_rows_norm_expand, base64_to_image_file
-
-from typing import Callable, Optional
+from api.utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, sqlx_rows_norm_expand, base64_to_image_file, convert_epoch_to_datetime, run_query
 
 admin_bp = Blueprint("admin", __name__, url_prefix="")
 
@@ -287,8 +285,8 @@ def order_page():
 
         ##
 
-        page = parse_num(_page)
-        page_size = parse_num(_page_size)
+        page = parse_num(_page) or 1
+        page_size = parse_num(_page_size) or 1
 
         o = sqlx_easy_orm(engine, meta.tables.get("orders"))
         c = sqlx_easy_orm(engine, meta.tables.get("carts"))
@@ -300,12 +298,14 @@ def order_page():
             offset: int
             offset = (page - 1) * page_size
 
-            orders = o.get(
+            rows = o.getall(
                 [
+                    "orders.id",
                     "orders.shipping_method",
                     "orders.status",
                     "orders.created_at",
                     "users.id",
+                    "users.name",
                     "users.email",
                     "carts.id",
                     "carts.quantity",
@@ -339,15 +339,17 @@ def order_page():
                 ## order have checkout
                 ## no check soft delete
                 # p.c.is_deleted != True,
+
+                c.c.is_ordered == True,
                 
                 offset=offset,
                 size=page_size
             )
 
-            orders = sqlx_rows_norm_expand(orders)
+            rows = sqlx_rows_norm_expand(rows)
 
             ## jika data orders kosong
-            if orders is None or not orders:
+            if rows is None or not rows:
 
                 return jsonify({
 
@@ -355,12 +357,9 @@ def order_page():
                     "data": []
                 }), 200
 
-            ## normalize
-            orders = sqlx_rows_norm_expand(orders)
-
             data = []
 
-            for order in orders:
+            for order in rows:
 
                 # id
                 # title
@@ -376,14 +375,13 @@ def order_page():
 
                 status = order.status
                 shipping_method = order.shipping_method
-                created_at = order.created_at
+                created_at = convert_epoch_to_datetime(order.created_at)
 
 
                 user = order.users
                 user_id = user.id
 
                 cart = order.carts
-                cart_id = cart.id
                 cart_quantity = cart.quantity
                 # size = cart.size or [ "S", "M", "L" ]
                 # size = cart.size or [ "?" ]
@@ -398,9 +396,25 @@ def order_page():
 
                 images_url = get_images_url_from_column_images(product.images)
 
+                """
+                    {
+                        "data": [
+                        {
+                            "id": "order_id(uuid)",
+                            "user_name": "nama user",
+                            "created_at": "Tue, 25 august 2022",
+                            "user_id": "uuid",
+                            "user_email": "user@gmail.com",
+                            "total": 1000
+                        }
+                        ]
+                    }
+                """
+
                 data += [
                     {
-                        "id": cart_id,
+                        "id": order.id,
+                        "user_name": user.name,
                         "title": product_title,
                         "size": size,
                         "price": product_price,
@@ -409,9 +423,11 @@ def order_page():
                         "product_detail": product_detail,
                         "shipping_method": shipping_method,
                         "shipping_status": status,
+                        "status": status,
                         "method": shipping_method,
                         "status": status,
                         "email": user_email,
+                        "user_email": user_email,
                         "images_url": images_url,
                         "user_id": user_id,
                         "total": product_total,
@@ -428,3 +444,116 @@ def order_page():
         return jsonify({ "message": "error, selain admin belum di implemented" }), 401
 
     return auth_with_token(auth, order_page_main)
+
+
+@admin_bp.route("/categories",methods=["POST"])
+def category():
+    auth = request.headers.get("Authentication")
+
+    def create_category(userdata):
+        if not is_seller(userdata):
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        try:
+            id = request.json.get("id") or sqlx_gen_uuid()
+            name = request.json.get("name")
+            # images = request.json.get("images") ## base64 decode save as file in folder
+            is_deleted = request.json.get("is_deleted") or False
+        except:
+            return jsonify({"message": "Bad Request"}), 400
+        
+        # if type(images) is not list:
+        #     images = [ images ]
+        # ## images is List<Image> as Array<String>
+        # for images in images:
+        #     if type(images) is not str:
+        #         images.remove(images)
+        
+        if run_query(f"SELECT * FROM categories WHERE name='{name}'") == []:
+            run_query(f"INSERT INTO categories (id, name, images, is_deleted) VALUES ('{id}', '{name}', '', '{is_deleted}')", True)
+            return jsonify({"message": "Category Added"}),200
+        else:
+            return jsonify({"message": "error,Data already exists"}),200
+            
+    return auth_with_token(auth, create_category)
+
+@admin_bp.route("/categories/<string:category_id>",methods=["PUT"])
+def update_category_page(category_id):
+    auth = request.headers.get("Authentication")
+
+    def update_category(userdata):
+        if not is_seller(userdata):
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        try:
+            id = request.json.get("id")
+            name = request.json.get("name")
+            # images = request.json.get("images") or [] ## base64 decode save as file in folder
+            is_deleted = request.json.get("is_deleted")
+        except:
+            return jsonify({"message": "Bad Request"}), 400
+
+        # if type(images) is not list:
+        #     images = [ images ]
+        # ## images is List<Image> as Array<String>
+        # for images in images:
+        #     if type(images) is not str:
+        #         images.remove(images)
+
+        if run_query(f"SELECT * FROM categories WHERE name='{name}'") == []:
+            run_query(f"UPDATE categories SET name='{name}', images='', is_deleted='{is_deleted}' WHERE id='{id}'", True)
+            return jsonify({"message": "Category Updated"}),201
+        else:
+            return jsonify({"message": "error,Data Not Found"}),404
+            
+    return auth_with_token(auth, update_category)
+
+@admin_bp.route("/categories/<string:category_id>",methods=["DELETE"])
+def category_id_delete(category_id):
+    auth = request.headers.get("Authentication")
+
+    def delete_category(userdata):
+        if not is_seller(userdata):
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        try:
+            id = request.json.get("id")
+        except:
+            return jsonify({"message": "Bad Request"}), 400
+            
+        if run_query(f"SELECT FROM categories WHERE id='{id}'") != []:
+            run_query(f"UPDATE categories SET is_deleted='True' WHERE id='{id}'", True)
+            return jsonify({"message": "Category Deleted"}),201
+        else:
+            return jsonify({"message": "error,Data Not Found"}),404
+            
+    return auth_with_token(auth, delete_category)
+
+@admin_bp.route("/products/<string:product_id>",methods=["DELETE"])
+def product_id_delete(product_id):
+    auth = request.headers.get("Authentication")
+
+    def delete_product(userdata):
+        if not is_seller(userdata):
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        try:
+            id = request.json.get("id")
+        except:
+            return jsonify({"message": "Bad Request"}), 400
+
+        if run_query(f"SELECT FROM products WHERE id='{id}'") != []:
+            run_query(f"UPDATE products SET is_deleted='True' WHERE id='{id}'", True)
+            return jsonify({"message": "Product Deleted"}),201
+        else:
+            return jsonify({"message": "error,Data Not Found"}),404
+    
+    return auth_with_token(auth, delete_product)
+
+@admin_bp.route("/sales",methods=["GET"])
+def sales():
+    auth = request.headers.get("Authentication")
+
+    def get_total_sales(userdata):
+        if not is_seller:
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        
+        return jsonify ({"total": userdata.balance}), 200
+
+    return auth_with_token(auth, get_total_sales)
