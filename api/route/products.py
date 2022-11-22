@@ -21,6 +21,13 @@ def get_category():
     return jsonify(data), 200
 
 
+@products_bp.route("/categories", methods=["GET"])
+def get_categories():
+    data = run_query("SELECT id, name as title FROM categories WHERE NOT is_deleted='true'")
+    data = {"data": data}
+    return jsonify(data), 200
+
+
 @products_bp.route("/products", methods=["GET"])
 def get_products():
     body = request.args
