@@ -17,7 +17,7 @@ from sqlx import sqlx_easy_orm, sqlx_gen_uuid
 from flask import Blueprint, request, jsonify
 from .supports import auth_with_token
 from schema.meta import engine, meta
-from api.utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, sqlx_rows_norm_expand, base64_to_image_file, convert_epoch_to_datetime
+from api.utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, sqlx_rows_norm_expand, base64_to_image_file, convert_epoch_to_datetime, run_query
 
 admin_bp = Blueprint("admin", __name__, url_prefix="")
 
@@ -444,3 +444,116 @@ def order_page():
         return jsonify({ "message": "error, selain admin belum di implemented" }), 401
 
     return auth_with_token(auth, order_page_main)
+
+
+@admin_bp.route("/categories",methods=["POST"])
+def category():
+    auth = request.headers.get("Authentication")
+
+    def create_category(userdata):
+        if not is_seller(userdata):
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        try:
+            id = request.json.get("id") or sqlx_gen_uuid()
+            name = request.json.get("name")
+            # images = request.json.get("images") ## base64 decode save as file in folder
+            is_deleted = request.json.get("is_deleted") or False
+        except:
+            return jsonify({"message": "Bad Request"}), 400
+        
+        # if type(images) is not list:
+        #     images = [ images ]
+        # ## images is List<Image> as Array<String>
+        # for images in images:
+        #     if type(images) is not str:
+        #         images.remove(images)
+        
+        if run_query(f"SELECT * FROM categories WHERE name='{name}'") == []:
+            run_query(f"INSERT INTO categories (id, name, images, is_deleted) VALUES ('{id}', '{name}', '', '{is_deleted}')", True)
+            return jsonify({"message": "Category Added"}),200
+        else:
+            return jsonify({"message": "error,Data already exists"}),200
+            
+    return auth_with_token(auth, create_category)
+
+@admin_bp.route("/categories/<string:category_id>",methods=["PUT"])
+def update_category_page(category_id):
+    auth = request.headers.get("Authentication")
+
+    def update_category(userdata):
+        if not is_seller(userdata):
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        try:
+            id = request.json.get("id")
+            name = request.json.get("name")
+            # images = request.json.get("images") or [] ## base64 decode save as file in folder
+            is_deleted = request.json.get("is_deleted")
+        except:
+            return jsonify({"message": "Bad Request"}), 400
+
+        # if type(images) is not list:
+        #     images = [ images ]
+        # ## images is List<Image> as Array<String>
+        # for images in images:
+        #     if type(images) is not str:
+        #         images.remove(images)
+
+        if run_query(f"SELECT * FROM categories WHERE name='{name}'") == []:
+            run_query(f"UPDATE categories SET name='{name}', images='', is_deleted='{is_deleted}' WHERE id='{id}'", True)
+            return jsonify({"message": "Category Updated"}),201
+        else:
+            return jsonify({"message": "error,Data Not Found"}),404
+            
+    return auth_with_token(auth, update_category)
+
+@admin_bp.route("/categories/<string:category_id>",methods=["DELETE"])
+def category_id_delete(category_id):
+    auth = request.headers.get("Authentication")
+
+    def delete_category(userdata):
+        if not is_seller(userdata):
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        try:
+            id = request.json.get("id")
+        except:
+            return jsonify({"message": "Bad Request"}), 400
+            
+        if run_query(f"SELECT FROM categories WHERE id='{id}'") != []:
+            run_query(f"UPDATE categories SET is_deleted='True' WHERE id='{id}'", True)
+            return jsonify({"message": "Category Deleted"}),201
+        else:
+            return jsonify({"message": "error,Data Not Found"}),404
+            
+    return auth_with_token(auth, delete_category)
+
+@admin_bp.route("/products/<string:product_id>",methods=["DELETE"])
+def product_id_delete(product_id):
+    auth = request.headers.get("Authentication")
+
+    def delete_product(userdata):
+        if not is_seller(userdata):
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        try:
+            id = request.json.get("id")
+        except:
+            return jsonify({"message": "Bad Request"}), 400
+
+        if run_query(f"SELECT FROM products WHERE id='{id}'") != []:
+            run_query(f"UPDATE products SET is_deleted='True' WHERE id='{id}'", True)
+            return jsonify({"message": "Product Deleted"}),201
+        else:
+            return jsonify({"message": "error,Data Not Found"}),404
+    
+    return auth_with_token(auth, delete_product)
+
+@admin_bp.route("/sales",methods=["GET"])
+def sales():
+    auth = request.headers.get("Authentication")
+
+    def get_total_sales(userdata):
+        if not is_seller:
+            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+        
+        return jsonify ({"total": userdata.balance}), 200
+
+    return auth_with_token(auth, get_total_sales)
