@@ -17,7 +17,7 @@ from sqlx import sqlx_easy_orm, sqlx_gen_uuid
 from flask import Blueprint, request, jsonify
 from .supports import auth_with_token
 from schema.meta import engine, meta
-from api.utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, sqlx_rows_norm_expand, base64_to_image_file, convert_epoch_to_datetime
+from api.utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, sqlx_rows_norm_expand, base64_to_image_file, convert_epoch_to_datetime, run_query
 
 admin_bp = Blueprint("admin", __name__, url_prefix="")
 
@@ -473,7 +473,7 @@ def category():
         
         if run_query(f"SELECT * FROM categories WHERE name='{name}'") == []:
             run_query(f"INSERT INTO categories (id, name, images, is_deleted) VALUES ('{id}', '{name}', '', '{is_deleted}')", True)
-            return jsonify({"message": "Category Added"}),201
+            return jsonify({"message": "Category Added"}),200
         else:
             return jsonify({"message": "error,Data already exists"}),200
             
@@ -501,7 +501,7 @@ def update_category_page(category_id):
         #     if type(images) is not str:
         #         images.remove(images)
 
-        if run_query(f"SELECT * FROM categories WHERE name='{name}'") != []:
+        if run_query(f"SELECT * FROM categories WHERE name='{name}'") == []:
             run_query(f"UPDATE categories SET name='{name}', images='', is_deleted='{is_deleted}' WHERE id='{id}'", True)
             return jsonify({"message": "Category Updated"}),201
         else:
