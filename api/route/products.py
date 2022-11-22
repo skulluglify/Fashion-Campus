@@ -21,16 +21,23 @@ def get_category():
     return jsonify(data), 200
 
 
+@products_bp.route("/categories", methods=["GET"])
+def get_categories():
+    data = run_query("SELECT id, name as title FROM categories WHERE NOT is_deleted='true'")
+    data = {"data": data}
+    return jsonify(data), 200
+
+
 @products_bp.route("/products", methods=["GET"])
 def get_products():
     body = request.args
-    body_sort_by, body_category, body_price, body_condition, body_product_name = "Price a_z", None, None, None, None
+    body_sort_by, body_category, body_price, body_condition, body_product_name = "Price a_z", "category_testing", None, "new", None
     try:
-        body_page = body["page"]
+        body_page = int(body["page"])
     except:
         return jsonify({ "message": "error, page not valid" }), 400
     try:
-        body_page_size = body["body_page_size"]
+        body_page_size = int(body["page_size"])
     except:
         return jsonify({ "message": "error, page size not valid" }), 400
     try:
@@ -40,7 +47,8 @@ def get_products():
     try:
         body_category = body["category"].split(",")
     except:
-        return jsonify({ "message": "error, category not valid" }), 400
+        # return jsonify({ "message": "error, category not valid" }), 400
+        pass
     try:
         body_price = body["price"]
         min_price, max_price = [int(x) for x in body_price.split(",")]
@@ -49,7 +57,8 @@ def get_products():
     try:
         body_condition = body["condition"].lower()
     except:
-        return jsonify({ "message": "error, condition not valid" }), 400
+        # return jsonify({ "message": "error, condition not valid" }), 400
+        pass
     try:
         body_product_name = body["product_name"]
     except:
@@ -60,7 +69,7 @@ def get_products():
     for i in range(len(data)):
         single_data = data[i]
         if body_product_name != None:
-            if single_data[i]["name"] != body_product_name:
+            if single_data["name"] != body_product_name:
                 data[i] = "KOSONG"
                 continue
 
@@ -74,16 +83,18 @@ def get_products():
         if len(body_condition) > 5:
             pass
         else:
-            if single_data[i]["condition"].lower() != body_condition:
+            if single_data["condition"].lower() != body_condition:
                 data[i] = "KOSONG"
                 continue
 
-        if single_data[i]["category_id"] not in body_category:
+        if single_data["category_id"] not in body_category:
             data[i] = "KOSONG"
             continue
 
-    data = set(data)
-    data.remove("KOSONG")
+    # return data
+    # data = set(data)
+    while "KOSONG" in data:
+        data.remove("KOSONG")
     
     if body_sort_by[-1] == 'z':
         data.sort(key = lambda x: x["price"])

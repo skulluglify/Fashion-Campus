@@ -78,6 +78,40 @@ def get_shipping_prices(userdata: DRow):
     return [], 0
 
 
+@carts_bp.route("/cart", methods=["POST"])
+def post_cart():
+    auth = request.headers.get("authentication")
+    
+    def post_cart_main(userdata):
+        body = request.json
+        try:
+            prd_id = body["id"]
+        except:
+            return jsonify({ "message": "error, item not valid" }), 400
+        try:
+            quantity = body["quantity"]
+            if quantity < 1:
+                return jsonify({ "message": "error, please specify the quantity" }), 400
+        except:
+            return jsonify({ "message": "error, quantity not valid" }), 400
+        try:
+            size = body["size"].upper()
+            if size not in ['XS', 'S', 'M', 'L', 'XL', 'XXL']:
+                return jsonify({ "message": "error, uncommon size" }), 400
+        except:
+            return jsonify({ "message": "error, size not valid" }), 400
+        usr_id = userdata.id
+        cart_id = uuid.uuid4()
+        check_cart = run_query(f"SELECT * FROM carts WHERE user_id = '{usr_id}' AND product_id = '{prd_id}' AND size = '{size}'")
+        if check_cart == []:
+            run_query(f"INSERT INTO carts VALUES ('{cart_id}', '{usr_id}', '{prd_id}', {quantity}, '{size}', false)", True)
+        else:
+            run_query(f"UPDATE carts SET quantity = (quantity + {quantity}) WHERE user_id = '{usr_id}' AND product_id = '{prd_id}' AND size = '{size}'", True)
+        return jsonify({ "message": "Item added to cart"}), 200
+    
+    return auth_with_token(auth, post_cart_main)
+
+
 @carts_bp.route("/cart", methods=["GET"])
 def get_cart():
     auth = request.headers.get("authentication")
@@ -108,12 +142,19 @@ def get_cart():
 def delete_cart(cart_id):
     auth = request.headers.get("authentication")
     
-    def delete_cart_main(cart_id):
-        try:
-            run_query(f"DELETE FROM carts WHERE id = '{cart_id}'", True)
-        except:
-            return jsonify({ "message": "error, item not valid"}), 400
-        return jsonify({ "message": "Cart deleted"}), 200
+    def delete_cart_main(userdata):
+        uid = run_query(f"SELECT user_id FROM carts WHERE id = '{cart_id}'")
+        if uid != []:
+            if userdata.id == uid[0]["user_id"]:
+                try:
+                    run_query(f"DELETE FROM carts WHERE id = '{cart_id}'", True)
+                except:
+                    return jsonify({ "message": "error, item not valid"}), 400
+                return jsonify({ "message": "Cart deleted"}), 200
+            else:
+                return jsonify({ "message": "error, user unauthorized"}), 400
+        else:
+            return jsonify({ "message": "error, item not found"}), 400
 
     return auth_with_token(auth, delete_cart_main)
 
