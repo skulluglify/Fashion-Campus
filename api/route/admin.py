@@ -69,7 +69,7 @@ def products_page():
 
         if not is_seller(userdata):
 
-            return jsonify({ "message": "error, bukan admin tidak boleh masok" }), 401
+            return jsonify({ "message": "error, unauthorized account" }), 401
 
         product_name = request.json.get("product_name")
         description = request.json.get("description")
@@ -136,7 +136,7 @@ def products_page():
 
             return jsonify({ "message": "error, product fail added"}), 406 ## di tolak
 
-        return jsonify({ "message": "bruh, product has been added" }), 200
+        return jsonify({ "message": "success, product has been added" }), 200
 
     return auth_with_token(auth, products_page_main)
 
@@ -165,7 +165,7 @@ def products_update_page():
 
         if not is_seller(userdata):
 
-            return jsonify({ "message": "error, bukan admin tidak boleh masok" }), 401
+            return jsonify({ "message": "error, unauthorized account" }), 401
 
         product_name = request.json.get("product_name")
         description = request.json.get("description")
@@ -249,11 +249,11 @@ def products_update_page():
                 condition = condition
             ):
 
-                return jsonify({ "message": "success, product update" }), 201
+                return jsonify({ "message": "success, product updated" }), 201
 
-            return jsonify({ "message": "error, product fail update"}), 406 ## di tolak
+            return jsonify({ "message": "error, product failed to update"}), 406 ## di tolak
 
-        return jsonify({ "message": "bruh, product unknown" }), 200
+        return jsonify({ "message": "error, product unknown" }), 200
 
     return auth_with_token(auth, products_update_page_main)
 
@@ -452,10 +452,12 @@ def category():
 
     def create_category(userdata):
         if not is_seller(userdata):
-            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+            return jsonify({"message": "error, unauthorized account"}), 401
         try:
             id = request.json.get("id") or sqlx_gen_uuid()
-            name = request.json.get("name")
+            name = request.json.get("category_name")
+            if name == '':
+                 return jsonify({"message": "error, invalid name"}), 400
             # images = request.json.get("images") ## base64 decode save as file in folder
             is_deleted = request.json.get("is_deleted") or False
         except:
@@ -470,24 +472,25 @@ def category():
         
         if run_query(f"SELECT * FROM categories WHERE name='{name}'") == []:
             run_query(f"INSERT INTO categories (id, name, images, is_deleted) VALUES ('{id}', '{name}', '', '{is_deleted}')", True)
-            return jsonify({"message": "Category Added"}),200
+            return jsonify({"message": "Category added"}), 200
         else:
-            return jsonify({"message": "error,Data already exists"}),200
+            return jsonify({"message": "error, category already exists"}), 400
             
     return auth_with_token(auth, create_category)
 
 @admin_bp.route("/categories/<string:category_id>",methods=["PUT"])
 def update_category_page(category_id):
     auth = request.headers.get("Authentication")
+    cat_id = category_id
 
     def update_category(userdata):
         if not is_seller(userdata):
-            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+            return jsonify({"message": "error, unauthorized account"}), 401
         try:
-            id = request.json.get("id")
-            name = request.json.get("name")
+            # id = request.json.get("category_id")
+            name = request.json.get("category_name")
             # images = request.json.get("images") or [] ## base64 decode save as file in folder
-            is_deleted = request.json.get("is_deleted")
+            # is_deleted = request.json.get("is_deleted")
         except:
             return jsonify({"message": "Bad Request"}), 400
 
@@ -498,31 +501,32 @@ def update_category_page(category_id):
         #     if type(images) is not str:
         #         images.remove(images)
 
-        if run_query(f"SELECT * FROM categories WHERE name='{name}'") == []:
-            run_query(f"UPDATE categories SET name='{name}', images='', is_deleted='{is_deleted}' WHERE id='{id}'", True)
-            return jsonify({"message": "Category Updated"}),201
+        if run_query(f"SELECT * FROM categories WHERE id='{cat_id}'") != []:
+            run_query(f"UPDATE categories SET name='{name}' WHERE id='{cat_id}'", True)
+            return jsonify({"message": "Category updated"}), 200
         else:
-            return jsonify({"message": "error,Data Not Found"}),404
+            return jsonify({"message": "error, invalid id"}), 400
             
     return auth_with_token(auth, update_category)
 
 @admin_bp.route("/categories/<string:category_id>",methods=["DELETE"])
 def category_id_delete(category_id):
     auth = request.headers.get("Authentication")
+    cat_id = category_id
 
     def delete_category(userdata):
         if not is_seller(userdata):
-            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
-        try:
-            id = request.json.get("id")
-        except:
-            return jsonify({"message": "Bad Request"}), 400
+            return jsonify({"message": "error, unauthorized account"}), 401
+        # try:
+        #     id = request.json.get("id")
+        # except:
+        #     return jsonify({"message": "Bad Request"}), 400
             
-        if run_query(f"SELECT FROM categories WHERE id='{id}'") != []:
-            run_query(f"UPDATE categories SET is_deleted='True' WHERE id='{id}'", True)
-            return jsonify({"message": "Category Deleted"}),201
+        if run_query(f"SELECT FROM categories WHERE id='{cat_id}'") != []:
+            run_query(f"UPDATE categories SET is_deleted=True WHERE id='{cat_id}'", True)
+            return jsonify({"message": "Category deleted"}), 200
         else:
-            return jsonify({"message": "error,Data Not Found"}),404
+            return jsonify({"message": "error, invalid id"}), 400
             
     return auth_with_token(auth, delete_category)
 
@@ -532,7 +536,7 @@ def product_id_delete(product_id):
 
     def delete_product(userdata):
         if not is_seller(userdata):
-            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+            return jsonify({"message": "error, unauthorized account"}), 401
         try:
             id = request.json.get("id")
         except:
@@ -552,7 +556,7 @@ def sales():
 
     def get_total_sales(userdata):
         if not is_seller:
-            return jsonify({"message": "error,bukan admin tidak boleh masuk"}), 401
+            return jsonify({"message": "error, unauthorized account"}), 401
         
         return jsonify ({"total": userdata.balance}), 200
 
