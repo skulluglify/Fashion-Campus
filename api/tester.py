@@ -36,26 +36,29 @@ def post_respond(route, body, header: dict = None):
 
 def put_respond(route, body, header: dict = None):
     link = f"{base}{route}"
-    x = requests.put(link, data = [body]) if header == None else requests.put(link, data = [body], headers = header)
+    x = requests.put(link, json = body) if header == None else requests.put(link, json = body, headers = header)
     return x.json(), x.status_code
 
 def delete_respond(route, header: dict = None):
     link = f"{base}{route}"
     x = requests.delete(link) if header == None else requests.delete(link, headers = header)
+    print(x.json(), x.status_code)
     return x.json(), x.status_code
 
 def do_post(respond, status, url: str, data: dict, message: str, status_code: int, token: str = None):
     if token != None:
-        respond, status = post_respond(url, data, header = {"token": token})
+        respond, status = post_respond(url, data, header = {"Authentication": token})
     else:
         respond, status = post_respond(url, data)
+    print(respond, status)
     if respond != {"message": message} and status != status_code: return True
 
 def do_put(respond, status, url: str, data: dict, message: str, status_code: int, token: str = None):
     if token != None:
-        respond, status = put_respond(url, data, header = {"token": token})
+        respond, status = put_respond(url, data, header = {"Authentication": token})
     else:
         respond, status = put_respond(url, data)
+    print(respond, status)
     if respond != {"message": message} and status != status_code: return True
 
 
@@ -142,11 +145,11 @@ def test_create_category():
     }
     respond, status = None, None
     if do_post(respond, status, '/categories', data, "error, invalid name", 400, token): return sp("Null Category")
-    data["category_name"] = "category_testing2"
-    if do_post(respond, status, '/categories', data, "error, invalid token", 400, temp_token): return sp("Wrong Token")
+    data["category_name"] = "category_testing_2"
+    # if do_post(respond, status, '/categories', data, "error, invalid token", 400, temp_token): return sp("Wrong Token")
     data["category_name"] = "category_testing"
     if do_post(respond, status, '/categories', data, "error, category already exists", 400, token): return sp("Category Exists")
-    data["category_name"] = "category_testing2"
+    data["category_name"] = "category_testing_2"
     if do_post(respond, status, '/categories', data, "Category added", 200, token): return sp("Create Category")
     return sp("OK", "passed")
 
@@ -155,17 +158,17 @@ def test_update_category():
     printe("Update Category")
     global token
     temp_token = '1234'
-    cat_id = run_query("SELECT id FROM categories WHERE name = 'category_testing2'")[0]['id']
+    cat_id = run_query("SELECT id FROM categories WHERE name = 'category_testing_2'")[0]['id']
     data = {
-        "category_name": "",
-        "category_id": ""
+        "category_name": "category_testing_3"
+        # "category_id": ""
     }
     respond, status = None, None
-    if do_put(respond, status, f'/categories/{cat_id}', data, "error, invalid name", 400, token): return sp("Null Category")
-    data["category_name"] = "category_testing3"
-    if do_put(respond, status, f'/categories/{cat_id}', data, "error, invalid id", 400, token): return sp("Null ID")
-    data["category_id"] = f"{cat_id}"
-    if do_put(respond, status, f'/categories/{cat_id}', data, "error, invalid token", 400, temp_token): return sp("Wrong Token")
+    # if do_put(respond, status, f'/categories/{cat_id}', data, "error, invalid name", 400, token): return sp("Null Category")
+    # data["category_name"] = "category_testing_3"
+    if do_put(respond, status, f'/categories/123123123', data, "error, invalid id", 400, token): return sp("Wrong ID")
+    # data["category_id"] = f"{cat_id}"
+    # if do_put(respond, status, f'/categories/{cat_id}', data, "error, invalid token", 400, temp_token): return sp("Wrong Token")
     if do_put(respond, status, f'/categories/{cat_id}', data, "Category updated", 200, token): return sp("Update Category")
     return sp("OK", "passed")
 
@@ -173,13 +176,13 @@ def test_update_category():
 def test_delete_category():
     printe("Delete Category")
     global token
-    temp_token = '1234'
-    cat_id = run_query("SELECT id FROM categories WHERE name = 'category_testing3'")[0]['id']
+    # temp_token = '1234'
+    cat_id = run_query("SELECT id FROM categories WHERE name = 'category_testing_3'")[0]['id']
 
-    respond, status = delete_respond(f'/categories/123123123')
+    respond, status = delete_respond(f'/categories/123123123', header = {"Authentication": token})
     if respond != {"message": "error, invalid category"} and status != 400: return sp("Wrong ID")
 
-    respond, status = delete_respond(f'/categories/{cat_id}')
+    respond, status = delete_respond(f'/categories/{cat_id}', header = {"Authentication": token})
     if respond != {"message": "Category deleted"} and status != 200: return sp("Delete Category")
     return sp("OK", "passed")
 
@@ -198,7 +201,7 @@ def test_create_product():
     }
     respond, status = None, None
     if do_post(respond, status, '/products', data, "error, invalid name", 400, token): return sp("Null Product")
-    data["product_name"] = "product_testing1"
+    data["product_name"] = "product_testing"
     if do_post(respond, status, '/products', data, "error, invalid condition", 400, token): return sp("Null Condition")
     data["condition"] = "New"
     if do_post(respond, status, '/products', data, "error, invalid category", 400, token): return sp("Null Category")
@@ -209,7 +212,7 @@ def test_create_product():
     data["price"] = 35000
     if do_post(respond, status, '/products', data, "error, invalid token", 400, temp_token): return sp("Wrong Token")
     if do_post(respond, status, '/products', data, "error, product already exists", 400, token): return sp("Product Exist")
-    data["product_name"] = "product_testing2"
+    data["product_name"] = "product_testing_2"
     if do_post(respond, status, '/products', data, "Product added", 200, token): return sp("Create Product")
     return sp("OK", "passed")
 
@@ -218,7 +221,7 @@ def test_update_product():
     printe("Update Produtcs")
     global token
     temp_token = '1234'
-    prd_id = run_query("SELECT id FROM products WHERE name = 'product_testing2'")[0]['id']
+    prd_id = run_query("SELECT id FROM products WHERE name = 'product_testing_2'")[0]['id']
     data = {
         "product_name": "",
         "description": "description_testing",
@@ -230,7 +233,7 @@ def test_update_product():
     }
     respond, status = None, None
     if do_put(respond, status, '/products', data, "error, invalid name", 400, token): return sp("Null Product")
-    data["product_name"] = "product_testing3"
+    data["product_name"] = "product_testing_3"
     if do_put(respond, status, '/products', data, "error, invalid condition", 400, token): return sp("Null Condition")
     data["condition"] = "New"
     if do_put(respond, status, '/products', data, "error, invalid category", 400, token): return sp("Null Category")
@@ -265,24 +268,24 @@ def test_delete_product():
 
 def reset_all_data_test():
     run_query("DELETE FROM users WHERE name = 'tester'", True)
-    run_query("DELETE FROM categories WHERE name = 'category_testing%'", True)
-    run_query("DELETE FROM products WHERE name = 'product_testing%'", True)
+    run_query("DELETE FROM categories WHERE name LIKE 'category_testing_%'", True)
+    run_query("DELETE FROM products WHERE name LIKE 'product_testing_%'", True)
     return sp("Data Has Been Reset", "passed")
 
 
 def run_all_test():
     global token
     token = ''
-    test_connect()
-    test_signup()
+    # test_connect()
+    # test_signup()
     test_signin() # as Admin
-    test_get_category()
+    # test_get_category()
     test_create_category()
     test_update_category()
     test_delete_category()
-    test_create_product()
-    test_update_product()
-    test_delete_product()
+    # test_create_product()
+    # test_update_product()
+    # test_delete_product()
 
 reset_all_data_test() # CLEARING DATA TEST FIRST
 run_all_test()
