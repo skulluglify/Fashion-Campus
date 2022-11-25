@@ -22,7 +22,8 @@ def sp(text, condition: str = "failed"):
     print(f"{text} {cond}{COL.RESET}")
 
 def printe(text):
-    print(f"{COL.BOLD}{text}", end=' ')
+    print(f"{COL.BOLD}{text}")
+    # print(f"{COL.BOLD}{text}", end=' ')
 
 def get_respond(route):
     link = f"{base}{route}"
@@ -200,25 +201,25 @@ def test_create_product():
         "price": None
     }
     respond, status = None, None
-    if do_post(respond, status, '/products', data, "error, invalid name", 400, token): return sp("Null Product")
+    # if do_post(respond, status, '/products', data, "error, invalid name", 400, token): return sp("Null Product")
     data["product_name"] = "product_testing"
-    if do_post(respond, status, '/products', data, "error, invalid condition", 400, token): return sp("Null Condition")
+    # if do_post(respond, status, '/products', data, "error, invalid condition", 400, token): return sp("Null Condition")
     data["condition"] = "New"
-    if do_post(respond, status, '/products', data, "error, invalid category", 400, token): return sp("Null Category")
+    # if do_post(respond, status, '/products', data, "error, invalid category", 400, token): return sp("Null Category")
     data["category"] = "asdasdasdasd"
-    if do_post(respond, status, '/products', data, "error, category not found", 400, token): return sp("Wrong Category")
+    if do_post(respond, status, '/products', data, "error, category not found", 404, token): return sp("Wrong Category")
     data["category"] = "category_testing"
     if do_post(respond, status, '/products', data, "error, price hasn't been settled", 400, token): return sp("Null Price")
     data["price"] = 35000
-    if do_post(respond, status, '/products', data, "error, invalid token", 400, temp_token): return sp("Wrong Token")
+    # if do_post(respond, status, '/products', data, "error, invalid token", 400, temp_token): return sp("Wrong Token")
     if do_post(respond, status, '/products', data, "error, product already exists", 400, token): return sp("Product Exist")
     data["product_name"] = "product_testing_2"
-    if do_post(respond, status, '/products', data, "Product added", 200, token): return sp("Create Product")
+    if do_post(respond, status, '/products', data, "Product added", 201, token): return sp("Create Product")
     return sp("OK", "passed")
 
 
 def test_update_product():
-    printe("Update Produtcs")
+    printe("Update Products")
     global token
     temp_token = '1234'
     prd_id = run_query("SELECT id FROM products WHERE name = 'product_testing_2'")[0]['id']
@@ -227,25 +228,25 @@ def test_update_product():
         "description": "description_testing",
         "images": "",
         "condition": "",
-        "category": "",
+        "category": "asdasdasdasd",
         "price": None,
-        "product_id": ""
+        "product_id": f"{prd_id}"
     }
     respond, status = None, None
     if do_put(respond, status, '/products', data, "error, invalid name", 400, token): return sp("Null Product")
     data["product_name"] = "product_testing_3"
     if do_put(respond, status, '/products', data, "error, invalid condition", 400, token): return sp("Null Condition")
-    data["condition"] = "New"
-    if do_put(respond, status, '/products', data, "error, invalid category", 400, token): return sp("Null Category")
-    data["category"] = "asdasdasdasd"
+    data["condition"] = "new"
+    # if do_put(respond, status, '/products', data, "error, invalid category", 400, token): return sp("Null Category")
+    # data["category"] = ""
     if do_put(respond, status, '/products', data, "error, category not found", 400, token): return sp("Wrong Category")
     data["category"] = "category_testing"
     if do_put(respond, status, '/products', data, "error, price hasn't been settled", 400, token): return sp("Null Price")
-    data["price"] = 35000
-    if do_put(respond, status, '/products', data, "error, invalid id", 400, token): return sp("Wrong ID")
-    data["product_id"] = prd_id
-    if do_put(respond, status, '/products', data, "error, invalid id", 400, temp_token): return sp("Wrong Token")
-    if do_put(respond, status, '/products', data, "Product updated", 400, token): return sp("Update Product")
+    data["price"] = 45000
+    # if do_put(respond, status, '/products', data, "error, invalid id", 400, token): return sp("Wrong ID")
+    # data["product_id"] = prd_id
+    # if do_put(respond, status, '/products', data, "error, invalid id", 400, temp_token): return sp("Wrong Token")
+    if do_put(respond, status, '/products', data, "Product updated", 201, token): return sp("Update Product")
     return sp("OK", "passed")
 
 
@@ -253,13 +254,13 @@ def test_delete_product():
     printe("Delete Product")
     global token
     temp_token = '1234'
-    cat_id = run_query("SELECT id FROM products WHERE name = 'product_testing3'")[0]['id']
+    cat_id = run_query("SELECT id FROM products WHERE name = 'product_testing_3'")[0]['id']
 
-    respond, status = delete_respond(f'/products/123123123')
+    respond, status = delete_respond(f'/products/123123123', header = {"Authentication": token})
     if respond != {"message": "error, invalid product"} and status != 400: return sp("Wrong ID")
 
-    respond, status = delete_respond(f'/products/{cat_id}')
-    if respond != {"message": "product deleted"} and status != 200: return sp("Delete Product")
+    respond, status = delete_respond(f'/products/{cat_id}', header = {"Authentication": token})
+    if respond != {"message": "Product deleted"} and status != 200: return sp("Delete Product")
     return sp("OK", "passed")
 
 
@@ -280,12 +281,12 @@ def run_all_test():
     # test_signup()
     test_signin() # as Admin
     # test_get_category()
-    test_create_category()
-    test_update_category()
-    test_delete_category()
-    # test_create_product()
-    # test_update_product()
-    # test_delete_product()
+    # test_create_category()
+    # test_update_category()
+    # test_delete_category()
+    test_create_product()
+    test_update_product()
+    test_delete_product()
 
 reset_all_data_test() # CLEARING DATA TEST FIRST
 run_all_test()

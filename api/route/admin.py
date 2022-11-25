@@ -76,7 +76,15 @@ def products_page():
         images = request.json.get("images") or [] ## base64 decode save as file in folder
         condition = request.json.get("condition")
         category_id = request.json.get("category")
+
+        ctg_safe = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
+        
+        if category_id not in ctg_safe or category_id == "":
+            return jsonify({ "message": "error, category not found"}), 404
+        
         price = parse_num(request.json.get("price"))
+        if price in [None, 0]:
+            return jsonify({ "message": "price hasn't been settled"}), 400
 
         p = sqlx_easy_orm(engine, meta.tables.get("products"))
 
@@ -132,11 +140,12 @@ def products_page():
                 is_deleted = False
             ):
 
-                return jsonify({ "message": "success, product added" }), 201
+                return jsonify({ "message": "Product added" }), 201
 
             return jsonify({ "message": "error, product fail added"}), 406 ## di tolak
 
-        return jsonify({ "message": "success, product has been added" }), 200
+        # return jsonify({ "message": "success, product has been added" }), 200
+        return jsonify({ "message": "error, product already exists" }), 400
 
     return auth_with_token(auth, products_page_main)
 
@@ -167,19 +176,48 @@ def products_update_page():
 
             return jsonify({ "message": "error, unauthorized account" }), 401
 
-        product_name = request.json.get("product_name")
-        description = request.json.get("description")
-        images = request.json.get("images") or [] ## base64 decode save as file in folder
-        condition = request.json.get("condition")
-        category_id = request.json.get("category")
         product_id = request.json.get("product_id")
+        prd_info = run_query(f"SELECT * FROM products WHERE id = '{product_id}'")[0]
+        try:
+            product_name = request.json.get("product_name")
+            if product_name == "":
+                return jsonify({ "message": "error, invalid name" }), 400
+        except:
+            product_name = prd_info["name"]
+        try:
+            description = request.json.get("description")
+        except:
+            description = prd_info["detail"]
+        try:
+            images = request.json.get("images") # or [] ## base64 decode save as file in folder
+        except:
+            images = prd_info["images"]
+        try:
+            condition = request.json.get("condition").lower()
+            if condition not in ["new", "used"]:
+                return jsonify({ "message": "error, invalid condition" }), 400
+        except:
+            condition = prd_info["condition"]
+        try:
+            category_id = request.json.get("category")
+            ctg_safe = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
+            if category_id not in ctg_safe or category_id == "":
+                return jsonify({ "message": "error, category not found"}), 404
+        except:
+            category_id = prd_info["category_id"]
+        
 
         if type(product_id) is not str \
             or product_id == '':
             
             return jsonify({ "message": "error, product_id not found" }), 400
-
-        price = parse_num(request.json.get("price"))
+        
+        try:
+            price = parse_num(request.json.get("price"))
+            if price in [None, 0]:
+                return jsonify({ "message": "error, price hasn't been settled" }), 400
+        except:
+            category_id = prd_info["price"]
 
         p = sqlx_easy_orm(engine, meta.tables.get("products"))
 
@@ -249,7 +287,7 @@ def products_update_page():
                 condition = condition
             ):
 
-                return jsonify({ "message": "success, product updated" }), 201
+                return jsonify({ "message": "Product updated" }), 201
 
             return jsonify({ "message": "error, product failed to update"}), 406 ## di tolak
 
@@ -523,30 +561,31 @@ def category_id_delete(category_id):
         #     return jsonify({"message": "Bad Request"}), 400
             
         if run_query(f"SELECT FROM categories WHERE id='{cat_id}'") != []:
-            run_query(f"UPDATE categories SET is_deleted=True WHERE id='{cat_id}'", True)
+            run_query(f"UPDATE categories SET is_deleted=true WHERE id='{cat_id}'", True)
             return jsonify({"message": "Category deleted"}), 200
         else:
-            return jsonify({"message": "error, invalid id"}), 400
+            return jsonify({"message": "error, invalid category"}), 400
             
     return auth_with_token(auth, delete_category)
 
 @admin_bp.route("/products/<string:product_id>",methods=["DELETE"])
 def product_id_delete(product_id):
     auth = request.headers.get("Authentication")
+    prd_id = product_id
 
     def delete_product(userdata):
         if not is_seller(userdata):
             return jsonify({"message": "error, unauthorized account"}), 401
-        try:
-            id = request.json.get("id")
-        except:
-            return jsonify({"message": "Bad Request"}), 400
+        # try:
+        #     id = request.json.get("id")
+        # except:
+        #     return jsonify({"message": "Bad Request"}), 400
 
-        if run_query(f"SELECT FROM products WHERE id='{id}'") != []:
-            run_query(f"UPDATE products SET is_deleted='True' WHERE id='{id}'", True)
-            return jsonify({"message": "Product Deleted"}),201
+        if run_query(f"SELECT FROM products WHERE id='{prd_id}'") != []:
+            run_query(f"UPDATE products SET is_deleted=true WHERE id='{prd_id}'", True)
+            return jsonify({"message": "Product deleted"}),200
         else:
-            return jsonify({"message": "error,Data Not Found"}),404
+            return jsonify({"message": "error, invalid product"}),400
     
     return auth_with_token(auth, delete_product)
 
