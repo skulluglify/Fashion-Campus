@@ -47,8 +47,9 @@ def get_products():
     try:
         body_category = body["category"].split(",")
     except:
+        body_category = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
         # return jsonify({ "message": "error, category not valid" }), 400
-        pass
+        # pass
     try:
         body_price = body["price"]
         min_price, max_price = [int(x) for x in body_price.split(",")]
@@ -74,7 +75,7 @@ def get_products():
                 continue
 
         if body_price != None:
-            if min_price <= single_data[i]["price"] <= max_price:
+            if min_price <= single_data["price"] <= max_price:
                 pass
             else:
                 data[i] = "KOSONG"
