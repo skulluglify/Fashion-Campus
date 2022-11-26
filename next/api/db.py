@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import sqlalchemy as sqlx
+
 from sqlalchemy.engine import URL, Engine
+from sqlalchemy.sql.expression import Executable
 from sqlx.valid import Validation
 from sqlx import sqlx_encrypt_pass, sqlx_gen_uuid, sqlx_comp_pass, sqlx_create_metadata, sqlx_easy_orm
-from typing import Optional
+from typing import List, Optional, Union
 from util import Global
 
 
@@ -94,3 +96,20 @@ class DBInit:
         metadata.create_all(self.engine, checkfirst=True)
 
         return metadata
+
+
+    def execute(self, query: Union[Executable, str], commit: bool = False) -> List[dict]:
+
+        if isinstance(query, str):
+
+            query = sqlx.text(query)
+
+        with self.engine.connect() as conn:
+
+            if not commit:
+            
+                return [ dict(row) for row in conn.execute(query) ]
+            
+            else:
+            
+                conn.execute(query)

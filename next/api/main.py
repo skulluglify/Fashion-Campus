@@ -19,11 +19,15 @@ from base import UnicornException
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
-
+from util import Global
 
 app = FastAPI()
 
-cwd = os.getcwd()
+
+g = Global()
+
+STATIC_FOLDER = g.env.get("STATIC_FOLDER") or os.path.join(g.cwd, "static")
+IMAGES_FOLDER = g.env.get("IMAGE_FOLDER") or os.path.join(g.cwd, "images")
 
 @app.get("/")
 async def index_page():
@@ -39,15 +43,24 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
 
 def mount_file_static(src: str, dist: str):
 
-    @app.get(dist, response_class=FileResponse)
+    @app.get(dist, response_class=FileResponse, responses={
+        200: {
+            "content": {
+                "image/png": {},
+                "image/jpeg": {},
+                "image/x-icon": {}
+            }
+        }
+    })
     def file_static():
 
         return src
 
 
-mount_file_static(os.path.join(cwd, "static", "favicon.ico"), "/favicon.ico")
+mount_file_static(os.path.join(STATIC_FOLDER, "favicon.ico"), "/favicon.ico")
 
-app.mount("/static", StaticFiles(directory=os.path.join(cwd, "static")), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_FOLDER), name="static")
+app.mount("/image", StaticFiles(directory=IMAGES_FOLDER), name="images")
 app.include_router(views.users.router)
 
 
@@ -64,7 +77,10 @@ if str(__name__).upper() in ("__MAIN__",):
         workers=4, 
         headers=[
             ("Server", "ArvonServer v1.0"),
-            ("Access-Control-Allow-Origin", "*")
+            ("Access-Control-Allow-Origin", "*"),
+            ("Access-Control-Allow-Headers", "Content-Type, Content-Length, Content-Encoding, Content-Language, Content-Location"),
+            ("Access-Control-Allow-Methods", "GET, POST, PUT, UPDATE, DELETE"),
+            ("Access-Control-Max-Age", "86400"),
         ], 
         log_level="info"
     )

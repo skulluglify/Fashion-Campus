@@ -36,7 +36,17 @@ class UserSignUp(BaseModel):
     password: str
 
 
-@router.post("/sign-up")
+@router.post("/sign-up", responses={
+    201: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
 def user_sign_up_page(data: UserSignUp):
 
     try:
@@ -72,8 +82,25 @@ class UserSignIn(BaseModel):
     password: str
 
 
-@router.post("/sign-in")
-def user_sign_up_page(data: UserSignIn):
+@router.post("/sign-in", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "user_information": {
+                        "name": "string",
+                        "email": "string",
+                        "phone_number": "string",
+                        "type": "string",
+                    },
+                    "token": "string",
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
+def user_sign_in_page(data: UserSignIn):
 
     if not Validation.email_address(data.email):
 
@@ -124,7 +151,26 @@ def user_sign_up_page(data: UserSignIn):
     return manip.json_resp({ "message": "error, user not found" }, 404)
 
 
-@router.get("/user")
+@router.get("/user", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "data": {
+                        "name": "string",
+                        "email": "string",
+                        "phone_number": "string",
+                        "type": "string",
+                        "address": "string",
+                        "city": "string",
+                        "balance": "integer"
+                    },
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
 def user_info_page(request: Request):
 
     auth = request.headers.get("Authentication")
