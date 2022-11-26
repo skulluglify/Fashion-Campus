@@ -95,7 +95,7 @@ def categories_page(page: int, page_size: int, sort_by: str, category: str, pric
         }
     }
 })
-def get_product_page(id: str = Path(default=None, gt=0)):
+def get_product_page(id: str = Path(default=None)):
 
     pass
 
@@ -184,7 +184,7 @@ def cart_page(authentication: str = Header(default=None)):
         }
     }
 })
-def remove_cart_page(id: str = Path(default=None, gt=0), authentication: str = Header(default=None)):
+def remove_cart_page(id: str = Path(default=None), authentication: str = Header(default=None)):
 
     pass
 
