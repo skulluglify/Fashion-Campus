@@ -74,7 +74,7 @@ def get_products():
                 continue
 
         if body_price != None:
-            if min_price <= single_data[i]["price"] <= max_price:
+            if min_price <= single_data["price"] <= max_price:
                 pass
             else:
                 data[i] = "KOSONG"
