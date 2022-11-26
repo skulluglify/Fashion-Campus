@@ -14,7 +14,7 @@ import sqlalchemy as sqlx
 from flask import Blueprint, request, jsonify
 from api.valid import Validation
 from schema.meta import engine, meta
-from sqlx import sqlx_gen_uuid, sqlx_encypt_pass, sqlx_comp_pass, sqlx_easy_orm
+from sqlx import sqlx_gen_uuid, sqlx_encrypt_pass, sqlx_comp_pass, sqlx_easy_orm
 from api.utils import PasswordChecker, check_password, get_time_epoch_exp, get_value, get_time_epoch, parse_num, get_sort_columns, get_sort_rules, convert_epoch_to_datetime, get_images_url_from_column_images, sqlx_rows_norm_expand
 from .supports import auth_with_token, get_shipping_prices
 
@@ -92,7 +92,7 @@ def sign_up():
 
                 if (not u.get(name=name)):
 
-                    if (u.put(id=sqlx_gen_uuid(), name=name, email=email, phone=phone_number, password=sqlx_encypt_pass(password))):
+                    if (u.put(id=sqlx_gen_uuid(), name=name, email=email, phone=phone_number, password=sqlx_encrypt_pass(password))):
 
                         return jsonify({ "message": "success, user created" }), 201  
 
@@ -182,11 +182,15 @@ def user_info():
             "address": userdata.address,
             # "country": userdata.country,
             "city": userdata.city,
-            "balance": userdata.balance,
-            "message": "success, authorized"
+            "balance": userdata.balance
         }
 
-        return jsonify(data), 200
+        return jsonify({
+
+            "data": data,
+            "message": "success, authorized"
+            
+        }), 200
 
     return auth_with_token(auth, user_info_main)
 
@@ -268,7 +272,7 @@ def user_topup():
 
     def user_topup_main(userdata):
 
-        amount = request.args.get("amount")
+        amount = request.args.get("amount") or request.json.get("amount")
 
         if amount is not None:
 
