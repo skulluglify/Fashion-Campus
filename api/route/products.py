@@ -51,6 +51,7 @@ def get_products():
         # return jsonify({ "message": "error, category not valid" }), 400
         # pass
     
+    min_price, max_price = 0, 10000000
     # ikut FE
     try:
         body_price = "biar lolos if"
