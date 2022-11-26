@@ -208,11 +208,10 @@ def user_ship_address():
                 "name": userdata.address_name,
                 "phone_number": userdata.phone,
                 "address": userdata.address,
-                "city": userdata.city,
-                "message": "success, authorized"
+                "city": userdata.city
             }
 
-            return jsonify(data), 200
+            return jsonify({ "data": data, "message": "success, authorized" }), 200
 
         if request.method == "POST":
 
