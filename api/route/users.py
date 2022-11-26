@@ -272,7 +272,7 @@ def user_topup():
 
     def user_topup_main(userdata):
 
-        amount = request.args.get("amount")
+        amount = request.args.get("amount") or request.json.get("amount")
 
         if amount is not None:
 

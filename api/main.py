@@ -33,7 +33,7 @@ app = create_app()
 def apply_caching(request):
 
     request.headers["Access-Control-Allow-Origin"] = "*"
-    request.headers["Access-Control-Allow-Headers"] = "Content-Type, Content-Length, Content-Encoding, Content-Language, Content-Location"
+    request.headers["Access-Control-Allow-Headers"] = "Authentication, Content-Type, Content-Length, Content-Encoding, Content-Language, Content-Location"
     # request.headers["Access-Control-Allow-Headers"] = "Content-Type, Content-Length, Content-Encoding, Content-Language, Content-Location, Content-Range, Content-Security-Policy, Content-Security-Policy-Report-Only"
     request.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, UPDATE, DELETE"
     request.headers["Access-Control-Max-Age"] = "86400"

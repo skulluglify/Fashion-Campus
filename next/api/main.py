@@ -78,7 +78,7 @@ if str(__name__).upper() in ("__MAIN__",):
         headers=[
             ("Server", "ArvonServer v1.0"),
             ("Access-Control-Allow-Origin", "*"),
-            ("Access-Control-Allow-Headers", "Content-Type, Content-Length, Content-Encoding, Content-Language, Content-Location"),
+            ("Access-Control-Allow-Headers", "Authentication, Content-Type, Content-Length, Content-Encoding, Content-Language, Content-Location"),
             ("Access-Control-Allow-Methods", "GET, POST, PUT, UPDATE, DELETE"),
             ("Access-Control-Max-Age", "86400"),
         ], 
