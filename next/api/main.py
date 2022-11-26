@@ -68,7 +68,7 @@ if str(__name__).upper() in ("__MAIN__",):
 
     config = uvicorn.Config(app, 
         host="0.0.0.0", 
-        port=5000, 
+        port=8080, 
         server_header=False, 
         date_header=False,
         interface='asgi3',
