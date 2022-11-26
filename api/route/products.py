@@ -50,11 +50,21 @@ def get_products():
         body_category = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
         # return jsonify({ "message": "error, category not valid" }), 400
         # pass
+    
+    # ikut FE
+    try:
+        body_price = "biar lolos if"
+        min_price = body["prcStart"]
+        max_price = body["prcEnd"]
+    except:
+        pass
+    # ikut API req
     try:
         body_price = body["price"]
         min_price, max_price = [int(x) for x in body_price.split(",")]
     except:
         pass
+
     try:
         body_condition = body["condition"].lower()
     except:

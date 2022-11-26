@@ -84,7 +84,7 @@ def products_page():
         
         price = parse_num(request.json.get("price"))
         if price in [None, 0]:
-            return jsonify({ "message": "price hasn't been settled"}), 400
+            return jsonify({ "message": "error, price hasn't been settled"}), 400
 
         p = sqlx_easy_orm(engine, meta.tables.get("products"))
 
