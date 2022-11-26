@@ -31,7 +31,7 @@ def get_categories():
 @products_bp.route("/products", methods=["GET"])
 def get_products():
     body = request.args
-    body_sort_by, body_category, body_price, body_condition, body_product_name = "Price a_z", "category_testing", None, "new", None
+    body_sort_by, body_category, body_price, body_condition, body_product_name = "Price a_z", None, None, "new", None
     try:
         body_page = int(body["page"])
     except:
@@ -65,8 +65,9 @@ def get_products():
     except:
         pass
 
-    data = run_query(f"SELECT * FROM products WHERE NOT is_deleted='true' AND category_id = ANY(SELECT id FROM categories WHERE NOT is_deleted='true')")
-    
+    # data = run_query(f"SELECT * FROM products WHERE is_deleted != true AND category_id = ANY (SELECT id FROM categories WHERE is_deleted != true)")
+    data = run_query(f"SELECT * FROM products JOIN categories ON products.category_id = categories.id WHERE products.is_deleted != true AND categories.is_deleted != true")
+    # return data
     for i in range(len(data)):
         single_data = data[i]
         if body_product_name != None:
