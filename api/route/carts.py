@@ -104,7 +104,7 @@ def post_cart():
         except:
             return jsonify({ "message": "error, size not valid" }), 400
         usr_id = userdata.id
-        cart_id = uuid.uuid4()
+        cart_id = sqlx_gen_uuid()
         check_cart = run_query(f"SELECT * FROM carts WHERE user_id = '{usr_id}' AND product_id = '{prd_id}' AND size = '{size}'")
         if check_cart == []:
             run_query(f"INSERT INTO carts VALUES ('{cart_id}', '{usr_id}', '{prd_id}', {quantity}, '{size}', false)", True)
