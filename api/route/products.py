@@ -14,11 +14,12 @@ from api.utils import get_images_url_from_column_images, run_query
 
 products_bp = Blueprint("products", __name__, url_prefix="/")
 
-@products_bp.route("/home/category", methods=["GET"])
-def get_category():
-    data = run_query("SELECT id, images, name as title FROM categories WHERE NOT is_deleted='true'")
-    data = {"data": data}
-    return jsonify(data), 200
+## sudah ada di router home.py
+# @products_bp.route("/home/category", methods=["GET"])
+# def get_category():
+#     data = run_query("SELECT id, images, name as title FROM categories WHERE NOT is_deleted='true'")
+#     data = {"data": data}
+#     return jsonify(data), 200
 
 
 @products_bp.route("/categories", methods=["GET"])
