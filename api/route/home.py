@@ -39,14 +39,17 @@ def category_page():
 
     if rows is not None:
 
+        rows = rows_info_exclude_table_info(rows)
+
         data = []
 
         for row in rows:
 
             row = dict(row)
-            if hasattr(row, "images"):
-                row.images = get_images_url_from_column_images(row.images)
-                row.image = row.images[0] if len(row.images) > 0 else None
+            row["images"] = get_images_url_from_column_images(row["images"])
+            row["image"] = row["images"][0] if len(row["images"]) > 0 else None
+
+            row["title"] = row["name"]
 
             data += [row]
 
