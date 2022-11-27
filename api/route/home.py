@@ -39,6 +39,8 @@ def category_page():
 
     if rows is not None:
 
+        rows = rows_info_exclude_table_info(rows)
+
         data = []
 
         for row in rows:

@@ -113,7 +113,7 @@ def products_page():
 
             for (index, image) in enumerate([*images]):
 
-                im_filename = str(product_name + str(index)).replace(" ", "-")
+                im_filename = str(product_name + str(index)).lower().replace(" ", "-")
 
                 imagepath = base64_to_image_file(im_filename, image)
 
@@ -250,7 +250,7 @@ def products_update_page():
 
                 if image.startswith("data:"):
 
-                    im_filename = str(product_name + str(index)).replace(" ", "-")
+                    im_filename = str(product_name + str(index)).lower().replace(" ", "-")
 
                     imagepath = base64_to_image_file(im_filename, image)
 
