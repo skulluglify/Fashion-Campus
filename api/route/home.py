@@ -50,6 +50,8 @@ def category_page():
                 row.images = get_images_url_from_column_images(row.images)
                 row.image = row.images[0] if len(row.images) > 0 else None
 
+            row.title = row.name
+
             data += [row]
 
         return jsonify({ "message": "success, category found", "data": data }), 200
