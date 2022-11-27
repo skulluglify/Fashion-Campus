@@ -285,9 +285,24 @@ def test_user_balance():
     global token
     respond, status = get_respond('/user/balance', header = {"Authentication": token})
     actual_balance = run_query("SELECT balance FROM users WHERE email = 'user@gmail.com'")[0]
+    print(respond["message"], status)
     if respond["data"] == actual_balance and respond["message"] == 'success, get user balance' and status == 200:
         return sp("OK", "passed") 
-    
+    else:
+        return sp("Fail User Balance")
+
+
+def test_total_sales():
+    printe("Total Sales")
+    global token
+    respond, status = get_respond('/sales', header = {"Authentication": token})
+    actual_balance = run_query("SELECT balance FROM users WHERE email = 'admin@gmail.com'")[0]
+    print(respond, status)
+    if respond["data"]["total"] == actual_balance["balance"] and status == 200:
+        return sp("OK", "passed") 
+    else:
+        return sp("Fail Total Sales")
+
 
 ### MAIN FUNCTION, DO NOT EDIT JUST COMMENT ###
 
@@ -296,6 +311,7 @@ def reset_all_data_test():
     run_query("DELETE FROM categories WHERE name LIKE 'category_testing_%'", True)
     run_query("DELETE FROM products WHERE name LIKE 'product_testing_%'", True)
     run_query("UPDATE users SET balance = 200000 WHERE email = 'user@gmail.com'", True)
+    run_query("UPDATE users SET balance = 100000 WHERE email = 'admin@gmail.com'", True)
     return sp("Data Has Been Reset", "passed")
 
 
@@ -305,8 +321,8 @@ def run_all_test():
     # test_connect()
 
     # test_signup()
-    test_signin() # as User
-    # test_signin(True) # as Admin
+    # test_signin() # as User
+    test_signin(True) # as Admin
 
     # test_get_category()
     
@@ -318,8 +334,9 @@ def run_all_test():
     # test_update_product()
     # test_delete_product()
 
-    test_top_up()
-    test_user_balance()
+    # test_top_up()
+    # test_user_balance()
+    test_total_sales()
 
 reset_all_data_test() # CLEARING DATA TEST FIRST
 run_all_test()
