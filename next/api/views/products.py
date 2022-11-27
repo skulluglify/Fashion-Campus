@@ -38,10 +38,10 @@ router = APIRouter(
                             "id": "uuid",
                             "image": "string",
                             "title": "string",
-                            "price": "number"
+                            "price": 0
                         }
                     ],
-                    "total_rows": "number",
+                    "total_rows": 0,
                     "message": "string"
                 }
             }
@@ -85,7 +85,7 @@ def categories_page(page: int, page_size: int, sort_by: str, category: str, pric
                         "title": "string",
                         "size": [],
                         "product_detail": "string",
-                        "price": "number",
+                        "price": 0,
                         "category_id": "uuid",
                         "category_name": "string"
                     },
@@ -154,10 +154,10 @@ def add_cart_page(cart: AddCart, authentication: str = Header(default=None)):
                         {
                             "id": "uuid",
                             "details": {
-                                "quantity": "number",
+                                "quantity": 0,
                                 "size": "string"
                             },
-                            "price": "number",
+                            "price": 0,
                             "image": "string",
                             "name": "string"
                         }
