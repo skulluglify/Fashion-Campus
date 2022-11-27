@@ -403,7 +403,7 @@ def user_get_order():
     def user_get_order_main(userdata):
 
         page = parse_num(_page) or 1
-        page_size = parse_num(_page_size) or 1
+        page_size = parse_num(_page_size) or 100
 
         offset: int
         offset = (page - 1) * page_size
@@ -479,6 +479,7 @@ def user_get_order():
             ),
             
             c.c.is_ordered == True,
+            u.c.user_id == userdata.id,
 
             j,
 

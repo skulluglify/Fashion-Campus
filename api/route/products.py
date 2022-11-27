@@ -35,11 +35,13 @@ def get_products():
     try:
         body_page = int(body["page"])
     except:
-        return jsonify({ "message": "error, page not valid" }), 400
+        body_page = 1
+        # return jsonify({ "message": "error, page not valid" }), 400
     try:
         body_page_size = int(body["page_size"])
     except:
-        return jsonify({ "message": "error, page size not valid" }), 400
+        body_page_size = 100
+        # return jsonify({ "message": "error, page size not valid" }), 400
     try:
         body_sort_by = body["sort_by"]
     except:

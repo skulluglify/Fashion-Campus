@@ -324,7 +324,7 @@ def order_page():
         ##
 
         page = parse_num(_page) or 1
-        page_size = parse_num(_page_size) or 1
+        page_size = parse_num(_page_size) or 100
 
         o = sqlx_easy_orm(engine, meta.tables.get("orders"))
         c = sqlx_easy_orm(engine, meta.tables.get("carts"))
@@ -594,7 +594,7 @@ def sales():
     auth = request.headers.get("Authentication")
 
     def get_total_sales(userdata):
-        if not is_seller:
+        if not is_seller(userdata):
             return jsonify({"message": "error, unauthorized account"}), 401
         
         return jsonify ({"total": userdata.balance}), 200
