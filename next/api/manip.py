@@ -18,7 +18,7 @@ class Manip:
     db = DBInit()
 
     engine = db.engine
-    metadata = db.schema()
+    metadata = db.metadata
 
     def json_resp(self, data: dict, code: int = 200) -> JSONResponse:
 

@@ -177,34 +177,39 @@ def products_update_page():
             return jsonify({ "message": "error, unauthorized account" }), 401
 
         product_id = request.json.get("product_id")
-        prd_info = run_query(f"SELECT * FROM products WHERE id = '{product_id}'")[0]
-        try:
-            product_name = request.json.get("product_name")
-            if product_name == "":
-                return jsonify({ "message": "error, invalid name" }), 400
-        except:
-            product_name = prd_info["name"]
-        try:
-            description = request.json.get("description")
-        except:
-            description = prd_info["detail"]
-        try:
-            images = request.json.get("images") # or [] ## base64 decode save as file in folder
-        except:
-            images = prd_info["images"]
-        try:
-            condition = request.json.get("condition").lower()
-            if condition not in ["new", "used"]:
-                return jsonify({ "message": "error, invalid condition" }), 400
-        except:
-            condition = prd_info["condition"]
-        try:
-            category_id = request.json.get("category")
-            ctg_safe = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
-            if category_id not in ctg_safe or category_id == "":
-                return jsonify({ "message": "error, category not found"}), 404
-        except:
-            category_id = prd_info["category_id"]
+        # prd_info = run_query(f"SELECT * FROM products WHERE id = '{product_id}'")[0]
+        # try:
+        product_name = request.json.get("product_name")
+        #     product_name = request.json.get("product_name")
+        #     if product_name == "":
+        #         return jsonify({ "message": "error, invalid name" }), 400
+        # except:
+        #     product_name = prd_info["name"]
+        # try:
+        description = request.json.get("description")
+        #     description = request.json.get("description")
+        # except:
+        #     description = prd_info["detail"]
+        # try:
+        images = request.json.get("images")
+        #     images = request.json.get("images") # or [] ## base64 decode save as file in folder
+        # except:
+        #     images = prd_info["images"]
+        # try:
+        condition = request.json.get("condition")
+        #     condition = request.json.get("condition").lower()
+        #     if condition not in ["new", "used"]:
+        #         return jsonify({ "message": "error, invalid condition" }), 400
+        # except:
+        #     condition = prd_info["condition"]
+        # try:
+        category_id = request.json.get("category")
+        #     category_id = request.json.get("category")
+        #     ctg_safe = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
+        #     if category_id not in ctg_safe or category_id == "":
+        #         return jsonify({ "message": "error, category not found"}), 404
+        # except:
+        #     category_id = prd_info["category_id"]
         
 
         if type(product_id) is not str \
@@ -212,12 +217,13 @@ def products_update_page():
             
             return jsonify({ "message": "error, product_id not found" }), 400
         
-        try:
-            price = parse_num(request.json.get("price"))
-            if price in [None, 0]:
-                return jsonify({ "message": "error, price hasn't been settled" }), 400
-        except:
-            category_id = prd_info["price"]
+        # try:
+        price = parse_num(request.json.get("price"))
+        #     price = parse_num(request.json.get("price"))
+        #     if price in [None, 0]:
+        #         return jsonify({ "message": "error, price hasn't been settled" }), 400
+        # except:
+        #     category_id = prd_info["price"]
 
         p = sqlx_easy_orm(engine, meta.tables.get("products"))
 
@@ -236,21 +242,23 @@ def products_update_page():
 
         product = p.get(product_id)
 
-        if product is not None:
+        if product:
 
             for (index, image) in enumerate([*images]):
 
-                im_filename = str(product_name + str(index)).replace(" ", "-")
+                if image.startswith("data:"):
 
-                imagepath = base64_to_image_file(im_filename, image)
+                    im_filename = str(product_name + str(index)).replace(" ", "-")
 
-                if imagepath is not None:
+                    imagepath = base64_to_image_file(im_filename, image)
 
-                    ## change route from /images to /image
-                    images[index] = os.path.join("/image/", os.path.basename(imagepath))
-                    continue
-                
-                images[index] = image
+                    if imagepath is not None:
+
+                        ## change route from /images to /image
+                        images[index] = os.path.join("/image/", os.path.basename(imagepath))
+                        continue
+                    
+                    images[index] = image
 
             if type(product_name) is None:
 
@@ -324,7 +332,7 @@ def order_page():
         ##
 
         page = parse_num(_page) or 1
-        page_size = parse_num(_page_size) or 1
+        page_size = parse_num(_page_size) or 100
 
         o = sqlx_easy_orm(engine, meta.tables.get("orders"))
         c = sqlx_easy_orm(engine, meta.tables.get("carts"))
@@ -594,9 +602,9 @@ def sales():
     auth = request.headers.get("Authentication")
 
     def get_total_sales(userdata):
-        if not is_seller:
+        if not is_seller(userdata):
             return jsonify({"message": "error, unauthorized account"}), 401
         
-        return jsonify ({"total": userdata.balance}), 200
+        return jsonify ({ "data": { "total": userdata.balance } }), 200
 
     return auth_with_token(auth, get_total_sales)

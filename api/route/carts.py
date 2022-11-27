@@ -12,7 +12,7 @@ from flask import Blueprint, request, jsonify
 from schema.meta import engine, meta
 from sqlx import sqlx_gen_uuid, sqlx_easy_orm
 from sqlx.base import DRow
-from api.utils import get_time_epoch, run_query
+from api.utils import get_time_epoch, run_query, parse_num, is_num
 from .supports import auth_with_token
 
 carts_bp = Blueprint("carts", __name__, url_prefix="/")
@@ -89,9 +89,12 @@ def post_cart():
         except:
             return jsonify({ "message": "error, item not valid" }), 400
         try:
-            quantity = body["quantity"]
-            if quantity < 1:
-                return jsonify({ "message": "error, please specify the quantity" }), 400
+            if is_num(body["quantity"]):
+                quantity = parse_num(body["quantity"])
+                if quantity < 1:
+                    return jsonify({ "message": "error, please specify the quantity" }), 400
+            else:
+                raise ValueError("Bruh ...")
         except:
             return jsonify({ "message": "error, quantity not valid" }), 400
         try:
@@ -101,7 +104,7 @@ def post_cart():
         except:
             return jsonify({ "message": "error, size not valid" }), 400
         usr_id = userdata.id
-        cart_id = uuid.uuid4()
+        cart_id = sqlx_gen_uuid()
         check_cart = run_query(f"SELECT * FROM carts WHERE user_id = '{usr_id}' AND product_id = '{prd_id}' AND size = '{size}'")
         if check_cart == []:
             run_query(f"INSERT INTO carts VALUES ('{cart_id}', '{usr_id}', '{prd_id}', {quantity}, '{size}', false)", True)

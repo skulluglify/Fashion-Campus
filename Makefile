@@ -16,3 +16,6 @@ no run:
 
 tester:
 	env PYTHONPATH=`pwd`/api ${PYTHON} api/tester.py
+
+clean:
+	bash clean.sh

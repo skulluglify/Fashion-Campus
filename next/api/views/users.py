@@ -4,6 +4,7 @@
 import jwt
 
 from db import DBInit
+from fastapi import Header
 from pydantic import BaseModel
 from fastapi import APIRouter, Request
 from sqlx import sqlx_easy_orm, sqlx_gen_uuid, sqlx_encrypt_pass, sqlx_comp_pass
@@ -11,11 +12,12 @@ from sqlx.base import DRow
 from sqlx.valid import Validation
 from manip import Manip
 from util import PasswordChecker, check_password, get_enhance_time_epoch
+from typing import Optional, Union
 
 db = DBInit()
 manip = Manip()
 engine = db.engine
-metadata = db.schema()
+metadata = db.metadata
 
 router = APIRouter(
     prefix="", 
@@ -163,7 +165,7 @@ def user_sign_in_page(data: UserSignIn):
                         "type": "string",
                         "address": "string",
                         "city": "string",
-                        "balance": "integer"
+                        "balance": "number"
                     },
                     "message": "string"
                 }
@@ -196,3 +198,131 @@ def user_info_page(request: Request):
     return manip.auth_with_token(auth, user_info_main)
 
 
+@router.get("/user/balance", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "balance": "number",
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
+def user_balance_page(authentication: str = Header(default=None)):
+
+    pass
+
+
+class UserBalance(BaseModel):
+    amount: int
+
+
+# params: amount
+@router.post("/user/balance", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
+def user_balance_page(payload: UserBalance, authentication: str = Header(default=None)):
+
+    pass
+
+
+@router.get("/user/shipping_address", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "data": {
+                        "id": "uuid",
+                        "name": "string",
+                        "phone_number": "string",
+                        "address": "string",
+                        "city": "string"
+                    },
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
+def shipping_address_page(authentication: str = Header(default=None)):
+
+    pass
+
+
+class ShippingAddress(BaseModel):
+    name: str
+    phone_number: str
+    address: str
+    city: str
+
+
+@router.post("/user/shipping_address", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
+def shipping_address_page(info: ShippingAddress, authentication: str = Header(default=None)):
+
+    pass
+
+
+@router.get("/shipping_price", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "data": [
+                        {
+                            "name": "string",
+                            "price": "number"
+                        }
+                    ],
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
+def shipping_price_page(authentication: str = Header(default=None)):
+
+    pass
+
+
+class Order(BaseModel):
+    shipping_method: str
+    shipping_address: ShippingAddress
+
+
+@router.post("/order", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
+def order_page(order: Order, authentication: str = Header(default=None)):
+
+    pass
+
+
+## 20 user order

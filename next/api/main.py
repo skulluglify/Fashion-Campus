@@ -12,8 +12,7 @@ import os
 import uvicorn
 # import pydantic
 # import datetime as dt
-
-import views.users
+import importlib as imports
 
 from base import UnicornException
 from fastapi import FastAPI, Request
@@ -61,14 +60,31 @@ mount_file_static(os.path.join(STATIC_FOLDER, "favicon.ico"), "/favicon.ico")
 
 app.mount("/static", StaticFiles(directory=STATIC_FOLDER), name="static")
 app.mount("/image", StaticFiles(directory=IMAGES_FOLDER), name="images")
-app.include_router(views.users.router)
+
+
+def load_router(module: str):
+
+    view = imports.import_module(module)
+
+    if view is not None:
+
+        router = getattr(view, "router", None)
+
+        if router is not None:
+
+            app.include_router(router)
+
+
+load_router("views.users")
+load_router("views.home")
+load_router("views.products")
 
 
 if str(__name__).upper() in ("__MAIN__",):
 
     config = uvicorn.Config(app, 
         host="0.0.0.0", 
-        port=5000, 
+        port=8080, 
         server_header=False, 
         date_header=False,
         interface='asgi3',
