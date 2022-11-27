@@ -79,8 +79,8 @@ def get_products():
         pass
 
     # data = run_query(f"SELECT * FROM products WHERE is_deleted != true AND category_id = ANY (SELECT id FROM categories WHERE is_deleted != true)")
-    data = run_query(f"SELECT * FROM products JOIN categories ON products.category_id = categories.id WHERE products.is_deleted != true AND categories.is_deleted != true")
-    # return data
+    data = run_query(f"SELECT products.id, products.name, products.images, products.price, products.condition, products.category_id FROM products JOIN categories ON products.category_id = categories.id WHERE products.is_deleted != true AND categories.is_deleted != true")
+
     for i in range(len(data)):
         single_data = data[i]
         if body_product_name != None:
@@ -117,7 +117,7 @@ def get_products():
         data.sort(key = lambda x: x["price"], reverse=True)
     
     data = [{"id": item["id"], "image": item["images"], "title": item["name"], "price": item["price"]} for item in data]
-
+    
     def divide_chunks(l, n):
         for i in range(0, len(l), n):
             yield l[i:i + n]
