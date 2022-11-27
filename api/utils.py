@@ -229,7 +229,7 @@ def get_images_url_from_column_images(images: str) -> List[str]:
 
     if images != "":
 
-        return images.split(",")
+        return [ *map(lambda x : x.strip(), images.split(",")) ]
 
     return []
 
