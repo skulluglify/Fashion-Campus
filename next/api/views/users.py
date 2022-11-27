@@ -165,7 +165,7 @@ def user_sign_in_page(data: UserSignIn):
                         "type": "string",
                         "address": "string",
                         "city": "string",
-                        "balance": "number"
+                        "balance": 0
                     },
                     "message": "string"
                 }
@@ -203,7 +203,7 @@ def user_info_page(request: Request):
         "content": {
             "application/json": {
                 "example": {
-                    "balance": "number",
+                    "balance": 0,
                     "message": "string"
                 }
             }
@@ -290,7 +290,7 @@ def shipping_address_page(info: ShippingAddress, authentication: str = Header(de
                     "data": [
                         {
                             "name": "string",
-                            "price": "number"
+                            "price": 0
                         }
                     ],
                     "message": "string"
@@ -325,4 +325,44 @@ def order_page(order: Order, authentication: str = Header(default=None)):
     pass
 
 
-## 20 user order
+@router.get("/user/order", responses={
+    200: {
+        "content": {
+            "application/json": {
+                "example": {
+                    "data": [
+                        {
+                            "id": "uuid",
+                            "created_at": "string",
+                            "products": [
+                                {
+                                    "id": "uuid",
+                                    "details": {
+                                        "quantity": 0,
+                                        "size": "string"
+                                    },
+                                    "price": 0,
+                                    "image": "string",
+                                    "name": "string"
+                                }
+                            ],
+                            "shipping_method": "string",
+                            "shipping_address": {
+                                "name": "string",
+                                "phone_number": "string",
+                                "address": "string",
+                                "city": "string"
+                            }
+                        }
+                    ],
+                    "message": "string"
+                }
+            }
+        }
+    }
+})
+def user_order_page(authentication: str = Header(default=None)):
+
+    pass
+
+

@@ -78,6 +78,7 @@ def load_router(module: str):
 load_router("views.users")
 load_router("views.home")
 load_router("views.products")
+load_router("views.admin")
 
 
 if str(__name__).upper() in ("__MAIN__",):

@@ -26,11 +26,13 @@ def banner_page():
 
     return jsonify({ "message": "error, banner not found" }), 400
 
+## prefix sudah di set /home/
 @home_bp.route("/category", methods=["GET"])
 def category_page():
 
     b = sqlx_easy_orm(engine, meta.tables.get("categories"))
 
+    # rows = b.getall(["id", "name"], b.c.is_deleted != True)
     rows = b.getall(["id", "name", "images"], b.c.is_deleted != True)
 
     rows = sqlx_rows_norm_expand(rows)
@@ -42,11 +44,12 @@ def category_page():
         for row in rows:
 
             row = dict(row)
-            row.images = get_images_url_from_column_images(row.images)
-            row.image = row.images[0] if len(row.images) > 0 else None
+            if hasattr(row, "images"):
+                row.images = get_images_url_from_column_images(row.images)
+                row.image = row.images[0] if len(row.images) > 0 else None
 
             data += [row]
 
-        return jsonify({ "message": "success, banner found", "data": data }), 200
+        return jsonify({ "message": "success, category found", "data": data }), 200
 
-    return jsonify({ "message": "error, banner not found" }), 400
+    return jsonify({ "message": "error, category not found" }), 400
