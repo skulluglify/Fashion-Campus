@@ -57,7 +57,6 @@ def get_products():
     min_price, max_price = 0, 10000000
     # ikut FE
     try:
-        body_price = "biar lolos if"
         min_price = body["prcStart"]
         max_price = body["prcEnd"]
     except:
