@@ -205,9 +205,9 @@ def products_update_page():
         # try:
         category_id = request.json.get("category")
         #     category_id = request.json.get("category")
-        #     ctg_safe = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
-        #     if category_id not in ctg_safe or category_id == "":
-        #         return jsonify({ "message": "error, category not found"}), 404
+        ctg_safe = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
+        if category_id not in ctg_safe:
+            return jsonify({ "message": "error, category not found"}), 404
         # except:
         #     category_id = prd_info["category_id"]
         
@@ -219,6 +219,8 @@ def products_update_page():
         
         # try:
         price = parse_num(request.json.get("price"))
+        if price <= 0:
+            return jsonify({ "message": "error, invalid price" }), 400
         #     price = parse_num(request.json.get("price"))
         #     if price in [None, 0]:
         #         return jsonify({ "message": "error, price hasn't been settled" }), 400

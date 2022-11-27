@@ -276,13 +276,15 @@ def user_topup():
         if amount is not None:
 
             balance = parse_num(amount)
+            if balance <= 0:
+                return jsonify({ "message": "error, invalid amount" }), 400
             balance += userdata.balance or 0
 
             u = sqlx_easy_orm(engine, meta.tables.get("users"))
 
             if u.update(userdata.id, balance=balance):
 
-                return jsonify({ "message": "success, user balance was updated" }), 200
+                return jsonify({ "message": "Top Up balance success" }), 200
 
             return jsonify({ "message": "error, something get wrong" }), 500
 

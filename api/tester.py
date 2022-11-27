@@ -25,9 +25,9 @@ def printe(text):
     print(f"{COL.BOLD}{text}")
     # print(f"{COL.BOLD}{text}", end=' ')
 
-def get_respond(route):
+def get_respond(route, header: dict = None):
     link = f"{base}{route}"
-    x = requests.get(link)
+    x = requests.get(link) if header == None else requests.get(link, headers = header)
     return x.json(), x.status_code
 
 def post_respond(route, body, header: dict = None):
@@ -106,7 +106,7 @@ def test_signup():
     return sp("OK", "passed")
 
 
-def test_signin():
+def test_signin(admin: bool = False):
     printe("Sign-in")
     data = {
         "email": "",
@@ -114,7 +114,8 @@ def test_signin():
     }
     respond, status = None, None
     if do_post(respond, status, '/sign-in', data, "error, email not valid", 400): return sp("Null Email")
-    data['email'] = 'admin@gmail.com'
+    data['email'] = 'admin@gmail.com' if admin else 'user@gmail.com'
+    print(data['email'])
     if do_post(respond, status, '/sign-in', data, "error, wrong password", 400): return sp("Wrong Password")
     data['password'] = 'admin'
 
@@ -233,15 +234,17 @@ def test_update_product():
         "product_id": f"{prd_id}"
     }
     respond, status = None, None
-    if do_put(respond, status, '/products', data, "error, invalid name", 400, token): return sp("Null Product")
+    # if do_put(respond, status, '/products', data, "error, invalid name", 400, token): return sp("Null Product")
     data["product_name"] = "product_testing_3"
-    if do_put(respond, status, '/products', data, "error, invalid condition", 400, token): return sp("Null Condition")
+    # if do_put(respond, status, '/products', data, "error, invalid condition", 400, token): return sp("Null Condition")
     data["condition"] = "new"
     # if do_put(respond, status, '/products', data, "error, invalid category", 400, token): return sp("Null Category")
-    # data["category"] = ""
+    data["category"] = "random_ctg_id"
     if do_put(respond, status, '/products', data, "error, category not found", 400, token): return sp("Wrong Category")
     data["category"] = "category_testing"
-    if do_put(respond, status, '/products', data, "error, price hasn't been settled", 400, token): return sp("Null Price")
+    data["price"] = 0
+    if do_put(respond, status, '/products', data, "error, invalid price", 400, token): return sp("Wrong Price")
+    
     data["price"] = 45000
     # if do_put(respond, status, '/products', data, "error, invalid id", 400, token): return sp("Wrong ID")
     # data["product_id"] = prd_id
@@ -264,6 +267,27 @@ def test_delete_product():
     return sp("OK", "passed")
 
 
+def test_top_up():
+    printe("Top Up")
+    global token
+    data = {
+        "amount": "-100000"
+    }
+    respond, status = None, None
+    if do_post(respond, status, '/user/balance', data, "error, invalid amount", 400, token): return sp("Invalid Amount")
+    data["amount"] = "300000"
+    if do_post(respond, status, '/user/balance', data, "Top Up balance success", 200, token): return sp("Top Up")
+    return sp("OK", "passed")
+
+
+def test_user_balance():
+    printe("User Balance")
+    global token
+    respond, status = get_respond('/user/balance', header = {"Authentication": token})
+    actual_balance = run_query("SELECT balance FROM users WHERE email = 'user@gmail.com'")[0]
+    if respond["data"] == actual_balance and respond["message"] == 'success, get user balance' and status == 200:
+        return sp("OK", "passed") 
+    
 
 ### MAIN FUNCTION, DO NOT EDIT JUST COMMENT ###
 
@@ -271,6 +295,7 @@ def reset_all_data_test():
     run_query("DELETE FROM users WHERE name = 'tester'", True)
     run_query("DELETE FROM categories WHERE name LIKE 'category_testing_%'", True)
     run_query("DELETE FROM products WHERE name LIKE 'product_testing_%'", True)
+    run_query("UPDATE users SET balance = 200000 WHERE email = 'user@gmail.com'", True)
     return sp("Data Has Been Reset", "passed")
 
 
@@ -278,15 +303,23 @@ def run_all_test():
     global token
     token = ''
     # test_connect()
+
     # test_signup()
-    test_signin() # as Admin
+    test_signin() # as User
+    # test_signin(True) # as Admin
+
     # test_get_category()
+    
     # test_create_category()
     # test_update_category()
     # test_delete_category()
-    test_create_product()
-    test_update_product()
-    test_delete_product()
+
+    # test_create_product()
+    # test_update_product()
+    # test_delete_product()
+
+    test_top_up()
+    test_user_balance()
 
 reset_all_data_test() # CLEARING DATA TEST FIRST
 run_all_test()
