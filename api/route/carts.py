@@ -110,7 +110,7 @@ def post_cart():
             run_query(f"INSERT INTO carts VALUES ('{cart_id}', '{usr_id}', '{prd_id}', {quantity}, '{size}', false)", True)
         else:
             run_query(f"UPDATE carts SET quantity = (quantity + {quantity}) WHERE user_id = '{usr_id}' AND product_id = '{prd_id}' AND size = '{size}'", True)
-        return jsonify({ "message": "success, Item added to cart"}), 200
+        return jsonify({ "message": "success, cart has been update"}), 200
     
     return auth_with_token(auth, post_cart_main)
 
