@@ -383,12 +383,14 @@ def order_page():
                     # "products.is_deleted",
                     p.c.is_deleted,
                     # sqlx.func.sum(c.c.quantity * p.c.price).label("total")
+                    c.c.order_key
                 ],
                 [
                     # u.c.name,
                     # p.c.name,
                     # o.c.created_at
                 ],
+                c.c.order_key == o.c.id,
                 get_sort_columns(
                     p.table, 
                     *get_sort_rules(sort_by)
