@@ -348,23 +348,46 @@ def order_page():
 
             rows = o.getall(
                 [
-                    "orders.id",
-                    "orders.shipping_method",
-                    "orders.status",
-                    "orders.created_at",
-                    "users.id",
-                    "users.name",
-                    "users.email",
-                    "carts.id",
-                    "carts.quantity",
-                    "carts.size",
+                    # "orders.id",
+                    o.c.id,
+                    # "orders.shipping_method",
+                    o.c.shipping_method,
+                    # "orders.status",
+                    o.c.status,
+                    # "orders.created_at",
+                    o.c.created_at,
+                    # "users.id",
+                    u.c.id,
+                    # "users.name",
+                    u.c.name,
+                    # "users.email",
+                    u.c.email,
+                    # "carts.id"
+                    c.c.id,
+                    # "carts.quantity",
+                    c.c.quantity,
+                    # "carts.size",
+                    c.c.size,
                     # "carts.is_deleted",
-                    "products.id",
-                    "products.name",
-                    "products.detail",
-                    "products.images",
-                    "products.price",
-                    "products.is_deleted",
+                    # c.c.is_deleted,
+                    # "products.id",
+                    p.c.id,
+                    # "products.name",
+                    p.c.name,
+                    # "products.detail",
+                    p.c.detail,
+                    # "products.images",
+                    p.c.images,
+                    # "products.price",
+                    p.c.price,
+                    # "products.is_deleted",
+                    p.c.is_deleted,
+                    # sqlx.func.sum(c.c.quantity * p.c.price).label("total")
+                ],
+                [
+                    # u.c.name,
+                    # p.c.name,
+                    # o.c.created_at
                 ],
                 get_sort_columns(
                     p.table, 
@@ -419,6 +442,8 @@ def order_page():
                 # user_id
                 # total
 
+                # print(order)
+
                 user_email = order.users.email
 
                 status = order.status
@@ -441,6 +466,7 @@ def order_page():
                 product_title = product.name
                 product_price = product.price
                 product_total = product_price * cart_quantity
+                # product_total = order.total or 0
 
                 images_url = get_images_url_from_column_images(product.images)
 
@@ -474,6 +500,7 @@ def order_page():
                         "status": status,
                         "method": shipping_method,
                         "status": status,
+                        "quantity": cart_quantity,
                         "email": user_email,
                         "user_email": user_email,
                         "images_url": images_url,
