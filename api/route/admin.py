@@ -15,7 +15,7 @@ import sqlalchemy as sqlx
 from sqlx import sqlx_easy_orm, sqlx_gen_uuid
 
 from flask import Blueprint, request, jsonify
-from .supports import auth_with_token
+from .supports import auth_with_token, get_shipping_prices_by_shipping_method
 from schema.meta import engine, meta
 from api.utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, sqlx_rows_norm_expand, base64_to_image_file, convert_epoch_to_datetime, run_query
 
@@ -467,6 +467,8 @@ def order_page():
                 product_price = product.price
                 product_total = product_price * cart_quantity
                 # product_total = order.total or 0
+
+                product_total += get_shipping_prices_by_shipping_method(shipping_method, product_total)
 
                 images_url = get_images_url_from_column_images(product.images)
 
