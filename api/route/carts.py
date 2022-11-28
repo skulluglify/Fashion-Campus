@@ -12,7 +12,7 @@ from flask import Blueprint, request, jsonify
 from schema.meta import engine, meta
 from sqlx import sqlx_gen_uuid, sqlx_easy_orm
 from sqlx.base import DRow
-from api.utils import get_time_epoch, run_query, parse_num, is_num
+from api.utils import get_time_epoch, run_query, get_images_url_from_column_images, parse_num, is_num
 from .supports import auth_with_token
 
 carts_bp = Blueprint("carts", __name__, url_prefix="/")
@@ -110,7 +110,7 @@ def post_cart():
             run_query(f"INSERT INTO carts VALUES ('{cart_id}', '{usr_id}', '{prd_id}', {quantity}, '{size}', false)", True)
         else:
             run_query(f"UPDATE carts SET quantity = (quantity + {quantity}) WHERE user_id = '{usr_id}' AND product_id = '{prd_id}' AND size = '{size}'", True)
-        return jsonify({ "message": "Item added to cart"}), 200
+        return jsonify({ "message": "success, cart has been update"}), 200
     
     return auth_with_token(auth, post_cart_main)
 
@@ -125,6 +125,8 @@ def get_cart():
         for item in raw_data:
             product_id = item["product_id"]
             prd_dtl = run_query(f"SELECT products.price, products.name, products.images FROM products JOIN categories ON products.category_id = categories.id WHERE products.is_deleted != 'true' AND categories.is_deleted != 'true' AND products.id = '{product_id}'")
+            
+            images = get_images_url_from_column_images(prd_dtl[0]["images"])
             req = {
                 "id": item["id"],
                 "details": {
@@ -132,7 +134,7 @@ def get_cart():
                     "size": item["size"]
                 },
                 "price": prd_dtl[0]["price"],
-                "image": prd_dtl[0]["images"],
+                "image": images[0] if len(images) > 0 else "",
                 "name": prd_dtl[0]["name"]
             }
             data.append(req)

@@ -55,7 +55,8 @@ def db_init():
         Column("product_id", ForeignKey(products.c.id), nullable=False),
         Column("quantity", Integer, nullable=False),
         Column("size", String, nullable=False),
-        Column("is_ordered", Boolean, default=False)
+        Column("is_ordered", Boolean, default=False),
+        Column("order_key", String)
     )
 
     orders = Table("orders", metadata,

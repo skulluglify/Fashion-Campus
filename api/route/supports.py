@@ -68,6 +68,20 @@ def auth_with_token(auth: Optional[str], fn: Callable):
 
     return jsonify({ "message": "error, bad request" }), 400
 
+
+def get_shipping_prices_by_shipping_method(shipping_method: str, total: int) -> int:
+
+    shipping_method = shipping_method.lower()
+
+    if shipping_method == "regular":
+        return int(total * .2 if 200 <= total else total * .15)
+
+    if shipping_method == "next day":
+        return int(total * .25 if 300 <= total else total * .2)
+
+    return 0
+
+
 def get_shipping_prices(userdata: DRow):
 
     c = sqlx_easy_orm(engine, meta.tables.get("carts"))

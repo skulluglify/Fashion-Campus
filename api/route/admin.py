@@ -15,7 +15,7 @@ import sqlalchemy as sqlx
 from sqlx import sqlx_easy_orm, sqlx_gen_uuid
 
 from flask import Blueprint, request, jsonify
-from .supports import auth_with_token
+from .supports import auth_with_token, get_shipping_prices_by_shipping_method
 from schema.meta import engine, meta
 from api.utils import get_images_url_from_column_images, get_sort_columns, get_sort_rules, is_seller, parse_num, sqlx_rows_norm_expand, base64_to_image_file, convert_epoch_to_datetime, run_query
 
@@ -113,7 +113,7 @@ def products_page():
 
             for (index, image) in enumerate([*images]):
 
-                im_filename = str(product_name + str(index)).replace(" ", "-")
+                im_filename = str(product_name + str(index)).lower().replace(" ", "-")
 
                 imagepath = base64_to_image_file(im_filename, image)
 
@@ -250,7 +250,7 @@ def products_update_page():
 
                 if image.startswith("data:"):
 
-                    im_filename = str(product_name + str(index)).replace(" ", "-")
+                    im_filename = str(product_name + str(index)).lower().replace(" ", "-")
 
                     imagepath = base64_to_image_file(im_filename, image)
 
@@ -348,24 +348,49 @@ def order_page():
 
             rows = o.getall(
                 [
-                    "orders.id",
-                    "orders.shipping_method",
-                    "orders.status",
-                    "orders.created_at",
-                    "users.id",
-                    "users.name",
-                    "users.email",
-                    "carts.id",
-                    "carts.quantity",
-                    "carts.size",
+                    # "orders.id",
+                    o.c.id,
+                    # "orders.shipping_method",
+                    o.c.shipping_method,
+                    # "orders.status",
+                    o.c.status,
+                    # "orders.created_at",
+                    o.c.created_at,
+                    # "users.id",
+                    u.c.id,
+                    # "users.name",
+                    u.c.name,
+                    # "users.email",
+                    u.c.email,
+                    # "carts.id"
+                    c.c.id,
+                    # "carts.quantity",
+                    c.c.quantity,
+                    # "carts.size",
+                    c.c.size,
                     # "carts.is_deleted",
-                    "products.id",
-                    "products.name",
-                    "products.detail",
-                    "products.images",
-                    "products.price",
-                    "products.is_deleted",
+                    # c.c.is_deleted,
+                    # "products.id",
+                    p.c.id,
+                    # "products.name",
+                    p.c.name,
+                    # "products.detail",
+                    p.c.detail,
+                    # "products.images",
+                    p.c.images,
+                    # "products.price",
+                    p.c.price,
+                    # "products.is_deleted",
+                    p.c.is_deleted,
+                    # sqlx.func.sum(c.c.quantity * p.c.price).label("total")
+                    c.c.order_key
                 ],
+                [
+                    # u.c.name,
+                    # p.c.name,
+                    # o.c.created_at
+                ],
+                c.c.order_key == o.c.id,
                 get_sort_columns(
                     p.table, 
                     *get_sort_rules(sort_by)
@@ -419,6 +444,8 @@ def order_page():
                 # user_id
                 # total
 
+                # print(order)
+
                 user_email = order.users.email
 
                 status = order.status
@@ -441,6 +468,9 @@ def order_page():
                 product_title = product.name
                 product_price = product.price
                 product_total = product_price * cart_quantity
+                # product_total = order.total or 0
+
+                product_total += get_shipping_prices_by_shipping_method(shipping_method, product_total)
 
                 images_url = get_images_url_from_column_images(product.images)
 
@@ -474,6 +504,7 @@ def order_page():
                         "status": status,
                         "method": shipping_method,
                         "status": status,
+                        "quantity": cart_quantity,
                         "email": user_email,
                         "user_email": user_email,
                         "images_url": images_url,

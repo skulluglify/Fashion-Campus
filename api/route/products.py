@@ -57,7 +57,6 @@ def get_products():
     min_price, max_price = 0, 10000000
     # ikut FE
     try:
-        body_price = "biar lolos if"
         min_price = body["prcStart"]
         max_price = body["prcEnd"]
     except:
@@ -107,6 +106,9 @@ def get_products():
             data[i] = "KOSONG"
             continue
 
+        ## +images handler
+        single_data["images"] = get_images_url_from_column_images(single_data["images"])
+
     # return data
     # data = set(data)
     while "KOSONG" in data:
@@ -117,7 +119,8 @@ def get_products():
     else:
         data.sort(key = lambda x: x["price"], reverse=True)
     
-    data = [{"id": item["id"], "image": item["images"], "title": item["name"], "price": item["price"]} for item in data]
+    ## +image handler
+    data = [{"id": item["id"], "image": item["images"][0] if len(item["images"]) > 0 else "", "title": item["name"], "price": item["price"]} for item in data]
     
     def divide_chunks(l, n):
         for i in range(0, len(l), n):
@@ -155,18 +158,24 @@ def search_image_page():
 
                     if len(body) > 0:
 
-                        ## TEAM AI
+                        try:
 
-                        ##>>>>>>>>
+                            ## TEAM AI
 
-                        ## TEAM AI
+                            ##>>>>>>>>
 
-                        c = sqlx_easy_orm(engine, meta.tables.get("categories"))
-                        row = c.get(["id"], name="paijo")
+                            ## TEAM AI
 
-                        if row is not None:
+                            c = sqlx_easy_orm(engine, meta.tables.get("categories"))
+                            row = c.get(["id"], name="paijo")
 
-                            return jsonify({ "message": "success, pencarian berhasil", "category_id": row.id }), 200
+                            if row is not None:
+
+                                return jsonify({ "message": "success, pencarian berhasil", "category_id": row.id }), 200
+
+                        except:
+
+                            return jsonify({ "message": "error, search category cannot be processed" }), 200
 
     return jsonify({ "message": "error, gagal pencarian gambar" }), 400
 
