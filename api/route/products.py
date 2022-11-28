@@ -48,7 +48,7 @@ def get_products():
     except:
         pass
     try:
-        body_category = body["category"].split(",")
+        body_category = body["category"].split(",") or body.getlist("cat")
     except:
         body_category = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
         # return jsonify({ "message": "error, category not valid" }), 400

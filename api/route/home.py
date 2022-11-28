@@ -5,7 +5,7 @@
 from flask import Blueprint, jsonify
 from schema.meta import engine, meta
 from sqlx import sqlx_easy_orm
-from api.utils import sqlx_rows_norm_expand, get_images_url_from_column_images, rows_info_exclude_table_info
+from api.utils import sqlx_rows_norm_expand, get_images_url_from_column_images, rows_info_exclude_table_info, run_query
 
 home_bp = Blueprint("home", __name__, url_prefix="/home")
 
@@ -33,7 +33,8 @@ def category_page():
     b = sqlx_easy_orm(engine, meta.tables.get("categories"))
 
     # rows = b.getall(["id", "name"], b.c.is_deleted != True)
-    rows = b.getall(["id", "name", "images"], b.c.is_deleted != True)
+    # rows = b.getall(["id", "name", "images"], b.c.is_deleted != True)
+    rows = run_query("SELECT id, images, name as title FROM categories WHERE NOT is_deleted='true'")
 
     rows = sqlx_rows_norm_expand(rows)
 
