@@ -360,7 +360,9 @@ def user_order():
 
             return jsonify({ "message": "error, user balance not enough" }), 400
 
-        if o.post(sqlx_gen_uuid(), userdata.id, shipping_method, name, phone, address, city, "waiting", get_time_epoch()):
+        order_id = sqlx_gen_uuid()
+
+        if o.post(order_id, userdata.id, shipping_method, name, phone, address, city, "waiting", get_time_epoch()):
         
             if u.update(userdata.id, balance=userdata.balance - total):
 
@@ -368,7 +370,7 @@ def user_order():
 
                     for cart in carts:
 
-                        if not c.update(cart.id, is_ordered=True):
+                        if not c.update(cart.id, is_ordered=True, order_key=order_id):
 
                             return jsonify({ "message": "error, cart cannot update data" }), 500
 

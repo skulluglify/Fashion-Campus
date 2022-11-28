@@ -158,18 +158,24 @@ def search_image_page():
 
                     if len(body) > 0:
 
-                        ## TEAM AI
+                        try:
 
-                        ##>>>>>>>>
+                            ## TEAM AI
 
-                        ## TEAM AI
+                            ##>>>>>>>>
 
-                        c = sqlx_easy_orm(engine, meta.tables.get("categories"))
-                        row = c.get(["id"], name="paijo")
+                            ## TEAM AI
 
-                        if row is not None:
+                            c = sqlx_easy_orm(engine, meta.tables.get("categories"))
+                            row = c.get(["id"], name="paijo")
 
-                            return jsonify({ "message": "success, pencarian berhasil", "category_id": row.id }), 200
+                            if row is not None:
+
+                                return jsonify({ "message": "success, pencarian berhasil", "category_id": row.id }), 200
+
+                        except:
+
+                            return jsonify({ "message": "error, search category cannot be processed" }), 200
 
     return jsonify({ "message": "error, gagal pencarian gambar" }), 400
 
