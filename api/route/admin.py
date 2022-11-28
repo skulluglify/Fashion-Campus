@@ -442,7 +442,7 @@ def order_page():
                 # user_id
                 # total
 
-                print(order)
+                # print(order)
 
                 user_email = order.users.email
 
