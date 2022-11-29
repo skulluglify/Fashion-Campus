@@ -33,8 +33,8 @@ def category_page():
     b = sqlx_easy_orm(engine, meta.tables.get("categories"))
 
     # rows = b.getall(["id", "name"], b.c.is_deleted != True)
-    # rows = b.getall(["id", "name", "images"], b.c.is_deleted != True)
-    rows = run_query("SELECT id, images, name as title FROM categories WHERE NOT is_deleted='true'")
+    rows = b.getall(["id", b.c.name.label("title"), "images"], b.c.is_deleted != True)
+    # rows = run_query("SELECT id, images, name as title FROM categories WHERE NOT is_deleted='true'")
 
     rows = sqlx_rows_norm_expand(rows)
 
@@ -44,13 +44,22 @@ def category_page():
 
         data = []
 
-        for row in rows:
+        limit = 10
+        
+        for (index, row) in enumerate(rows):
+
+            if index == limit:
+
+                break
+
+            if row["title"] in ("Ankle_Boot",):
+
+                limit += 1
+                continue
 
             row = dict(row)
             row["images"] = get_images_url_from_column_images(row["images"])
             row["image"] = row["images"][0] if len(row["images"]) > 0 else None
-
-            row["title"] = row["name"]
 
             data += [row]
 
