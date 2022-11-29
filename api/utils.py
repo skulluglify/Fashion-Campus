@@ -225,11 +225,13 @@ def sqlx_rows_norm_expand(data: drows_t) -> drows_t:
 
     return data
 
-def get_images_url_from_column_images(images: str) -> List[str]:
+def get_images_url_from_column_images(images: Optional[str]) -> List[str]:
 
-    if images != "":
+    if type(images) is str:
+            
+        if images != "":
 
-        return [ *map(lambda x : x.strip(), images.split(",")) ]
+            return [ *map(lambda x : x.strip(), images.split(",")) ]
 
     return []
 
