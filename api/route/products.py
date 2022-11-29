@@ -78,15 +78,20 @@ def get_products():
     except:
         pass
 
+    if type(body_product_name) is str:
+
+        body_product_name = body_product_name.strip()
+
     # data = run_query(f"SELECT * FROM products WHERE is_deleted != true AND category_id = ANY (SELECT id FROM categories WHERE is_deleted != true)")
     data = run_query(f"SELECT products.id, products.name, products.images, products.price, products.condition, products.category_id FROM products JOIN categories ON products.category_id = categories.id WHERE products.is_deleted != true AND categories.is_deleted != true")
 
     for i in range(len(data)):
         single_data = data[i]
         if body_product_name != None:
-            if single_data["name"] != body_product_name:
-                data[i] = "KOSONG"
-                continue
+            if body_product_name != "":
+                if not single_data["name"].lower().startswith(body_product_name.lower()):
+                    data[i] = "KOSONG"
+                    continue
 
         if body_price != None:
             if min_price <= single_data["price"] <= max_price:
