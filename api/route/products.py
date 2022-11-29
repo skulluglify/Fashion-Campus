@@ -53,7 +53,7 @@ def get_products():
         body_category = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
         # return jsonify({ "message": "error, category not valid" }), 400
         # pass
-    
+     
     min_price, max_price = 0, 10000000
     # ikut FE
     try:
