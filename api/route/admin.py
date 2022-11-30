@@ -390,7 +390,6 @@ def order_page():
                     # p.c.name,
                     # o.c.created_at
                 ],
-                c.c.order_key == o.c.id,
                 get_sort_columns(
                     p.table, 
                     *get_sort_rules(sort_by)
@@ -413,6 +412,7 @@ def order_page():
                 ## no check soft delete
                 # p.c.is_deleted != True,
 
+                c.c.order_key == o.c.id,
                 c.c.is_ordered == True,
                 
                 offset=offset,

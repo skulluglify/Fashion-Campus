@@ -482,6 +482,7 @@ def user_get_order():
                 *get_sort_rules(sort_by)
             ),
             
+            c.c.order_key == o.c.id,
             c.c.is_ordered == True,
             u.c.id == userdata.id,
 
