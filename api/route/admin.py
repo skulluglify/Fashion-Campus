@@ -325,202 +325,211 @@ def order_page():
 
     def order_page_main(userdata):
 
-        # Created_at
-        # User_id
-        # email
+        try:
 
-        ##
-
-        ##
-
-        page = parse_num(_page) or 1
-        page_size = parse_num(_page_size) or 100
-
-        o = sqlx_easy_orm(engine, meta.tables.get("orders"))
-        c = sqlx_easy_orm(engine, meta.tables.get("carts"))
-        p = sqlx_easy_orm(engine, meta.tables.get("products"))
-        u = sqlx_easy_orm(engine, meta.tables.get("users"))
-
-        if is_seller(userdata):
-
-            offset: int
-            offset = (page - 1) * page_size
-
-            rows = o.getall(
-                [
-                    # "orders.id",
-                    o.c.id,
-                    # "orders.shipping_method",
-                    o.c.shipping_method,
-                    # "orders.status",
-                    o.c.status,
-                    # "orders.created_at",
-                    o.c.created_at,
-                    # "users.id",
-                    u.c.id,
-                    # "users.name",
-                    u.c.name,
-                    # "users.email",
-                    u.c.email,
-                    # "carts.id"
-                    c.c.id,
-                    # "carts.quantity",
-                    c.c.quantity,
-                    # "carts.size",
-                    c.c.size,
-                    # "carts.is_deleted",
-                    # c.c.is_deleted,
-                    # "products.id",
-                    p.c.id,
-                    # "products.name",
-                    p.c.name,
-                    # "products.detail",
-                    p.c.detail,
-                    # "products.images",
-                    p.c.images,
-                    # "products.price",
-                    p.c.price,
-                    # "products.is_deleted",
-                    p.c.is_deleted,
-                    # sqlx.func.sum(c.c.quantity * p.c.price).label("total")
-                    c.c.order_key
-                ],
-                [
-                    # u.c.name,
-                    # p.c.name,
-                    # o.c.created_at
-                ],
-                get_sort_columns(
-                    p.table, 
-                    *get_sort_rules(sort_by)
-                ),
-                sqlx.join(
-                    o.table, 
-                    u.table, 
-                    o.c.get("user_id") == u.c.get("id")
-                )\
-                .join(
-                    c.table, 
-                    u.c.get("id") == c.c.get("user_id")
-                )\
-                .join(
-                    p.table,
-                    c.c.get("product_id") == p.c.get("id")
-                ),
-
-                ## order have checkout
-                ## no check soft delete
-                # p.c.is_deleted != True,
-
-                c.c.order_key == o.c.id,
-                c.c.is_ordered == True,
-                
-                offset=offset,
-                size=page_size
-            )
-
-            rows = sqlx_rows_norm_expand(rows)
-
-            ## jika data orders kosong
-            if rows is None or not rows:
-
-                return jsonify({
-
-                    "message": "success, data kosong",
-                    "data": []
-                }), 200
-
-            data = []
-
-            for order in rows:
-
-                # id
-                # title
-                # size
-                # created_at
-                # product_detail
-                # email
-                # images_url
-                # user_id
-                # total
-
-                # print(order)
-
-                user_email = order.users.email
-
-                status = order.status
-                shipping_method = order.shipping_method
-                created_at = convert_epoch_to_datetime(order.created_at)
-
-
-                user = order.users
-                user_id = user.id
-
-                cart = order.carts
-                cart_quantity = cart.quantity
-                # size = cart.size or [ "S", "M", "L" ]
-                # size = cart.size or [ "?" ]
-                size = cart.size or "L"
-
-                product = order.products
-
-                product_detail = product.detail
-                product_title = product.name
-                product_price = product.price
-                product_total = product_price * cart_quantity
-                # product_total = order.total or 0
-
-                product_total += get_shipping_prices_by_shipping_method(shipping_method, product_total)
-
-                images_url = get_images_url_from_column_images(product.images)
-
-                """
-                    {
-                        "data": [
-                        {
-                            "id": "order_id(uuid)",
-                            "user_name": "nama user",
-                            "created_at": "Tue, 25 august 2022",
-                            "user_id": "uuid",
-                            "user_email": "user@gmail.com",
-                            "total": 1000
-                        }
-                        ]
-                    }
-                """
-
-                data += [
-                    {
-                        "id": order.id,
-                        "user_name": user.name,
-                        "title": product_title,
-                        "size": size,
-                        "price": product_price,
-                        "created_at": created_at,
-                        "detail": product_detail,
-                        "product_detail": product_detail,
-                        "shipping_method": shipping_method,
-                        "shipping_status": status,
-                        "status": status,
-                        "method": shipping_method,
-                        "status": status,
-                        "quantity": cart_quantity,
-                        "email": user_email,
-                        "user_email": user_email,
-                        "images_url": images_url,
-                        "user_id": user_id,
-                        "total": product_total,
-                    }
-                ]
+            # Created_at
+            # User_id
+            # email
 
             ##
 
-            return jsonify({
-                "message": "success, data bisa diambil yee",
-                "data": data
-            }), 200
+            ##
 
-        return jsonify({ "message": "error, selain admin belum di implemented" }), 401
+            page = parse_num(_page) or 1
+            page_size = parse_num(_page_size) or 100
+
+            o = sqlx_easy_orm(engine, meta.tables.get("orders"))
+            c = sqlx_easy_orm(engine, meta.tables.get("carts"))
+            p = sqlx_easy_orm(engine, meta.tables.get("products"))
+            u = sqlx_easy_orm(engine, meta.tables.get("users"))
+
+            if is_seller(userdata):
+
+                offset: int
+                offset = (page - 1) * page_size
+
+                rows = o.getall(
+                    [
+                        # "orders.id",
+                        o.c.id,
+                        # "orders.shipping_method",
+                        o.c.shipping_method,
+                        # "orders.status",
+                        o.c.status,
+                        # "orders.created_at",
+                        o.c.created_at,
+                        # "users.id",
+                        u.c.id,
+                        # "users.name",
+                        u.c.name,
+                        # "users.email",
+                        u.c.email,
+                        # "carts.id"
+                        c.c.id,
+                        # "carts.quantity",
+                        c.c.quantity,
+                        # "carts.size",
+                        c.c.size,
+                        # "carts.is_deleted",
+                        # c.c.is_deleted,
+                        # "products.id",
+                        p.c.id,
+                        # "products.name",
+                        p.c.name,
+                        # "products.detail",
+                        p.c.detail,
+                        # "products.images",
+                        p.c.images,
+                        # "products.price",
+                        p.c.price,
+                        # "products.is_deleted",
+                        p.c.is_deleted,
+                        # sqlx.func.sum(c.c.quantity * p.c.price).label("total")
+                        c.c.order_key
+                    ],
+                    [
+                        # u.c.name,
+                        # p.c.name,
+                        # o.c.created_at
+                    ],
+                    get_sort_columns(
+                        p.table, 
+                        *get_sort_rules(sort_by)
+                    ),
+                    sqlx.join(
+                        o.table, 
+                        u.table, 
+                        o.c.get("user_id") == u.c.get("id")
+                    )\
+                    .join(
+                        c.table, 
+                        u.c.get("id") == c.c.get("user_id")
+                    )\
+                    .join(
+                        p.table,
+                        c.c.get("product_id") == p.c.get("id")
+                    ),
+
+                    ## order have checkout
+                    ## no check soft delete
+                    # p.c.is_deleted != True,
+
+                    c.c.order_key == o.c.id,
+                    c.c.is_ordered == True,
+                    
+                    offset=offset,
+                    size=page_size
+                )
+
+                rows = sqlx_rows_norm_expand(rows)
+
+                ## jika data orders kosong
+                if rows is None or not rows:
+
+                    return jsonify({
+
+                        "message": "success, data kosong",
+                        "data": []
+                    }), 200
+
+                data = []
+
+                for order in rows:
+
+                    # id
+                    # title
+                    # size
+                    # created_at
+                    # product_detail
+                    # email
+                    # images_url
+                    # user_id
+                    # total
+
+                    # print(order)
+
+                    user_email = order.users.email
+
+                    status = order.status
+                    shipping_method = order.shipping_method
+                    created_at = convert_epoch_to_datetime(order.created_at)
+
+
+                    user = order.users
+                    user_id = user.id
+
+                    cart = order.carts
+                    cart_quantity = cart.quantity
+                    # size = cart.size or [ "S", "M", "L" ]
+                    # size = cart.size or [ "?" ]
+                    size = cart.size or "L"
+
+                    product = order.products
+
+                    product_detail = product.detail
+                    product_title = product.name
+                    product_price = product.price
+                    product_total = product_price * cart_quantity
+                    # product_total = order.total or 0
+
+                    product_total += get_shipping_prices_by_shipping_method(shipping_method, product_total)
+
+                    images_url = get_images_url_from_column_images(product.images)
+
+                    """
+                        {
+                            "data": [
+                            {
+                                "id": "order_id(uuid)",
+                                "user_name": "nama user",
+                                "created_at": "Tue, 25 august 2022",
+                                "user_id": "uuid",
+                                "user_email": "user@gmail.com",
+                                "total": 1000
+                            }
+                            ]
+                        }
+                    """
+
+                    data += [
+                        {
+                            "id": order.id,
+                            "user_name": user.name,
+                            "title": product_title,
+                            "size": size,
+                            "price": product_price,
+                            "created_at": created_at,
+                            "detail": product_detail,
+                            "product_detail": product_detail,
+                            "shipping_method": shipping_method,
+                            "shipping_status": status,
+                            "status": status,
+                            "method": shipping_method,
+                            "status": status,
+                            "quantity": cart_quantity,
+                            "email": user_email,
+                            "user_email": user_email,
+                            "images_url": images_url,
+                            "user_id": user_id,
+                            "total": product_total,
+                        }
+                    ]
+
+                ##
+
+                return jsonify({
+                    "message": "success, data bisa diambil yee",
+                    "data": data
+                }), 200
+
+            return jsonify({ "message": "error, selain admin belum di implemented", "data": [] }), 401
+
+        except Exception as e:
+
+                return jsonify({
+                    "message": "error, something wrong",
+                    "data": []
+                }), 500
 
     return auth_with_token(auth, order_page_main)
 
