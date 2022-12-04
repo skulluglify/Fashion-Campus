@@ -13,70 +13,9 @@ from schema.meta import engine, meta
 from sqlx import sqlx_gen_uuid, sqlx_easy_orm
 from sqlx.base import DRow
 from api.utils import get_time_epoch, run_query, get_images_url_from_column_images, parse_num, is_num
-from .supports import auth_with_token
+from .supports import auth_with_token, get_shipping_prices
 
 carts_bp = Blueprint("carts", __name__, url_prefix="/")
-
-def get_shipping_prices(userdata: DRow):
-
-    c = sqlx_easy_orm(engine, meta.tables.get("carts"))
-    p = sqlx_easy_orm(engine, meta.tables.get("products"))
-
-    j = sqlx.join(c.table, p.table, c.c.product_id == p.c.id)
-
-    row = c.get(
-        [
-            sqlx.func.sum(p.c.price * c.c.quantity).label("total")
-        ],
-        [
-            c.c.user_id
-        ],
-        j,
-        user_id = userdata.id
-    )
-
-    if row is not None:
-
-        total = row.total
-
-        if isinstance(total, int):
-
-            """
-            regular
-
-            < 200 15%
-
-            >= 200 20%
-
-            next day
-
-            < 300 20%
-            >= 300 25%
-            """
-            data = []
-
-            ## flooring number
-
-            ## regular
-            regular = {
-                "name": "regular",
-                "price": int(total * .2 if 200 <= total else total * .15)
-            }
-
-            data += [regular]
-
-            ## next day
-            next_day = {
-                "name": "next day",
-                "price": int(total * .25 if 300 <= total else total * .2)
-            }
-
-            data += [next_day]
-
-            return data, total
-
-    return [], 0
-
 
 @carts_bp.route("/cart", methods=["POST"])
 def post_cart():
@@ -105,7 +44,7 @@ def post_cart():
             return jsonify({ "message": "error, size not valid" }), 400
         usr_id = userdata.id
         cart_id = sqlx_gen_uuid()
-        check_cart = run_query(f"SELECT * FROM carts WHERE user_id = '{usr_id}' AND product_id = '{prd_id}' AND size = '{size}'")
+        check_cart = run_query(f"SELECT * FROM carts WHERE user_id = '{usr_id}' AND product_id = '{prd_id}' AND size = '{size}' AND NOT is_ordered = TRUE")
         if check_cart == []:
             run_query(f"INSERT INTO carts VALUES ('{cart_id}', '{usr_id}', '{prd_id}', {quantity}, '{size}', false)", True)
         else:

@@ -5,13 +5,17 @@ TODO
 3. GET Category
 (OPTIONAL) all about products & categories
 """
+import io
+import base64
 import sqlalchemy as sqlx
 
 from flask import Blueprint, request, jsonify
 from schema.meta import engine, meta
 from sqlx import sqlx_easy_orm
 from api.utils import get_images_url_from_column_images, run_query
+from ai.impred import Impred
 
+impred = Impred()
 products_bp = Blueprint("products", __name__, url_prefix="/")
 
 ## sudah ada di router home.py
@@ -53,7 +57,7 @@ def get_products():
         body_category = [x["id"] for x in run_query("SELECT id FROM categories WHERE is_deleted != true")]
         # return jsonify({ "message": "error, category not valid" }), 400
         # pass
-    
+     
     min_price, max_price = 0, 10000000
     # ikut FE
     try:
@@ -78,15 +82,20 @@ def get_products():
     except:
         pass
 
+    if type(body_product_name) is str:
+
+        body_product_name = body_product_name.strip()
+
     # data = run_query(f"SELECT * FROM products WHERE is_deleted != true AND category_id = ANY (SELECT id FROM categories WHERE is_deleted != true)")
     data = run_query(f"SELECT products.id, products.name, products.images, products.price, products.condition, products.category_id FROM products JOIN categories ON products.category_id = categories.id WHERE products.is_deleted != true AND categories.is_deleted != true")
 
     for i in range(len(data)):
         single_data = data[i]
         if body_product_name != None:
-            if single_data["name"] != body_product_name:
-                data[i] = "KOSONG"
-                continue
+            if body_product_name != "":
+                if not single_data["name"].lower().startswith(body_product_name.lower()):
+                    data[i] = "KOSONG"
+                    continue
 
         if body_price != None:
             if min_price <= single_data["price"] <= max_price:
@@ -113,6 +122,11 @@ def get_products():
     # data = set(data)
     while "KOSONG" in data:
         data.remove("KOSONG")
+
+    if not data:
+    
+        out = {"data": data, "total_rows": 0}
+        return jsonify(out), 200
     
     if body_sort_by[-1] == 'z':
         data.sort(key = lambda x: x["price"])
@@ -140,11 +154,13 @@ def get_products():
 def search_image_page():
 
     image = request.args.get("image")
+    image_from_payload = request.json.get("image")
 
-    if image is not None:
+    if image is not None or image_from_payload is not None:
 
-        if isinstance(image, str):
+        body = ""
 
+        if isinstance(image, str) and image != "":
             if image.startswith("data:image/"):
 
                 header, body = image.split(",", 1)
@@ -156,26 +172,57 @@ def search_image_page():
 
                     ext = header[a+1:b]
 
-                    if len(body) > 0:
+                    if ext not in ("image/png", "image/jpeg", "image/x-icon"):
 
-                        try:
+                        return jsonify({ "message": "error, extension not supported" }), 400
 
-                            ## TEAM AI
+            else:
 
-                            ##>>>>>>>>
+                body = image
 
-                            ## TEAM AI
+        if isinstance(image_from_payload, str) and image_from_payload != "":
+            if image_from_payload.startswith("data:image/"):
 
-                            c = sqlx_easy_orm(engine, meta.tables.get("categories"))
-                            row = c.get(["id"], name="paijo")
+                header, body = image_from_payload.split(",", 1)
 
-                            if row is not None:
+                if ";" in header:
 
-                                return jsonify({ "message": "success, pencarian berhasil", "category_id": row.id }), 200
+                    a = header.index(":")
+                    b = header.index(";")
 
-                        except:
+                    ext = header[a+1:b]
 
-                            return jsonify({ "message": "error, search category cannot be processed" }), 200
+                    if ext not in ("image/png", "image/jpeg", "image/x-icon"):
+
+                        return jsonify({ "message": "error, extension not supported" }), 400
+
+            else:
+
+                body = image_from_payload
+
+        if len(body) > 0:
+
+            try:
+
+                data = base64.b64decode(body)
+                
+                buffer = io.BytesIO(data)
+
+                cat_pred = impred.classes_predict_by_image(buffer)
+                
+                c = sqlx_easy_orm(engine, meta.tables.get("categories"))
+                
+                row = c.get(["id"], name=cat_pred)
+
+                if row is not None:
+
+                    return jsonify({ "message": "success, search found", "category_id": row.id }), 200
+                
+                return jsonify({ "message": "error, failed search" }), 400
+
+            except:
+
+                return jsonify({ "message": "error, search category cannot be processed" }), 200
 
     return jsonify({ "message": "error, gagal pencarian gambar" }), 400
 
